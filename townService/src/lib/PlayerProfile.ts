@@ -1,4 +1,4 @@
-import Player from "./Player";
+import Player from './Player';
 
 export default class PlayerProfile {
   private readonly _id: string = ''; // this should probably match the id in the Player class?
