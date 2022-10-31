@@ -1,8 +1,20 @@
+import Player from "./Player";
+
 export default class PlayerProfile {
   private readonly _id: string = ''; // this should probably match the id in the Player class?
 
   public get id() {
     return this._id;
+  }
+
+  private _player: Player;
+
+  public get player() {
+    return this._player;
+  }
+
+  public set player(newPlayer: Player) {
+    this._player = newPlayer;
   }
 
   private _username: string;
@@ -55,8 +67,9 @@ export default class PlayerProfile {
     this._friendsList = newList;
   }
 
-  constructor(username: string, password: string) {
-    this._username = username;
+  constructor(player: Player, password: string) {
+    this._player = player;
+    this._username = player.userName;
     this._password = password;
   }
 

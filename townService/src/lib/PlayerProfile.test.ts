@@ -1,4 +1,15 @@
+import { TownEmitter } from "../types/CoveyTownSocket";
+import Player from "./Player";
+import PlayerProfile from "./PlayerProfile";
+import { mock } from 'jest-mock-extended';
+
 describe('PlayerProfile', () => {
+  beforeEach(() => {
+    const username = 'username';
+    const townEmitter: TownEmitter = mock<TownEmitter>();
+    const player = new Player(username, townEmitter);
+    const profile = new PlayerProfile(player, 'password');
+  })
   describe('username property', () => {
     it('returns correct username', () => {});
     it('sets to given username', () => {});
