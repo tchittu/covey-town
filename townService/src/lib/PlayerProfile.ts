@@ -1,12 +1,18 @@
+import { Pay } from 'twilio/lib/twiml/VoiceResponse';
 import Player from './Player';
 
+const DEFAULT_AVATAR = 'DefaultAvatar.png';
+
 export default class PlayerProfile {
-  private readonly _id: string = ''; // this should probably match the id in the Player class?
+  /** The identifier for this player profile. When a player logs on, this id will be set to 
+   * match the id of the corresponding Player object */
+  private readonly _id: string;
 
   public get id() {
     return this._id;
   }
 
+  /** The Player object that represents this player profile when the user is logged on */
   private _player: Player;
 
   public get player() {
@@ -17,6 +23,7 @@ export default class PlayerProfile {
     this._player = newPlayer;
   }
 
+  /** The username of the player which matches the username field of the corresponding Player object */
   private _username: string;
 
   public get username() {
@@ -27,6 +34,7 @@ export default class PlayerProfile {
     this._username = newUsername;
   }
 
+  /** The password that a player needs to enter to log in to this profile */
   private _password: string;
 
   public get password() {
@@ -37,7 +45,10 @@ export default class PlayerProfile {
     this._password = newPassword;
   }
 
-  private _avatar = ''; // set to some default image
+  /** The avatar that appears on this player's profile. It is initially set to a default image
+   * but can be changed by the user.
+   */
+  private _avatar = DEFAULT_AVATAR; 
 
   public get avatar() {
     return this._avatar;
@@ -47,6 +58,7 @@ export default class PlayerProfile {
     this._avatar = newAvatar;
   }
 
+  /** Information about this player that will be displayed to other players */
   private _aboutMe = '';
 
   public get aboutMe() {
@@ -57,6 +69,7 @@ export default class PlayerProfile {
     this._aboutMe = newAboutMe;
   }
 
+  /** A list of players that are friends with this player */
   private _friendsList: PlayerProfile[] = [];
 
   public get friendsList() {
@@ -68,16 +81,28 @@ export default class PlayerProfile {
   }
 
   constructor(player: Player, password: string) {
+    this._id = player.id;
     this._player = player;
     this._username = player.userName;
     this._password = password;
   }
 
-  public addFriend(friend: PlayerProfile) {
-    this._friendsList.push(friend);
+  /** Adds the given friend to this player's friend list if they are not already there and if the
+   * given player is not this player. If the given player profile is already in the friend list or
+   * if the given player profile is this player, nothing happens.
+   */
+  public addFriend(friend: PlayerProfile): void {
+    const alreadyFriend = this.friendsList.find(player => player.id === friend.id);
+    const isThisPlayer = (this.id === friend.id);
+    if (!alreadyFriend && !isThisPlayer) {
+      this._friendsList.push(friend);
+    }
   }
 
-  public removeFriend(friend: PlayerProfile) {
-    this._friendsList.filter(player => player.id !== friend.id);
+  /** Removes the given friend from this player's friend list if it is in the list. If the given player
+   * is not in the friend list, nothing happens.
+   */
+  public removeFriend(friend: PlayerProfile): void {
+    this.friendsList = this.friendsList.filter(player => player.id !== friend.id);
   }
 }
