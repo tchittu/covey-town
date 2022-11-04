@@ -1,10 +1,9 @@
-import { Pay } from 'twilio/lib/twiml/VoiceResponse';
 import Player from './Player';
 
 const DEFAULT_AVATAR = 'DefaultAvatar.png';
 
 export default class PlayerProfile {
-  /** The identifier for this player profile. When a player logs on, this id will be set to 
+  /** The identifier for this player profile. When a player logs on, this id will be set to
    * match the id of the corresponding Player object */
   private readonly _id: string;
 
@@ -48,7 +47,7 @@ export default class PlayerProfile {
   /** The avatar that appears on this player's profile. It is initially set to a default image
    * but can be changed by the user.
    */
-  private _avatar = DEFAULT_AVATAR; 
+  private _avatar = DEFAULT_AVATAR;
 
   public get avatar() {
     return this._avatar;
@@ -93,7 +92,7 @@ export default class PlayerProfile {
    */
   public addFriend(friend: PlayerProfile): void {
     const alreadyFriend = this.friendsList.find(player => player.id === friend.id);
-    const isThisPlayer = (this.id === friend.id);
+    const isThisPlayer = this.id === friend.id;
     if (!alreadyFriend && !isThisPlayer) {
       this._friendsList.push(friend);
     }
