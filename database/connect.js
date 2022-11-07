@@ -53,7 +53,7 @@ async function run() {
       password: "test password",
       avatar: "avatar is a string for now",
       aboutMe: "about me",
-      friendsList: "friends list",
+      friendsList: ["friend1", "friend2"],
     });
 
     // can retrieve a person's profile when they log in again
