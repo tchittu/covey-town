@@ -18,7 +18,7 @@ module.exports = {
     } catch (err) {
       console.log(err.stack);
     } finally {
-      await client.close();
+      //   await client.close();
     }
 
     // client.connect(function (err, db) {

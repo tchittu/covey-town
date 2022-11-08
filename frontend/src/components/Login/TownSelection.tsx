@@ -23,6 +23,7 @@ import { Town } from '../../generated/client';
 import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
+import axios from 'axios';
 
 export default function TownSelection(): JSX.Element {
   const [userName, setUserName] = useState<string>('');
@@ -78,6 +79,23 @@ export default function TownSelection(): JSX.Element {
         assert(videoToken);
         await videoConnect(videoToken);
         setTownController(newController);
+
+        // try adding user to database
+        const profile = {
+          username: userName,
+          password: '',
+          avatar: '',
+          aboutMe: '',
+          friendsList: [],
+        };
+        await axios
+          .post('http://localhost:4000/profiles/add', profile)
+          .then(res => {
+            console.log(res.data);
+          })
+          .catch(error => {
+            console.log(error);
+          });
       } catch (err) {
         if (err instanceof Error) {
           toast({
