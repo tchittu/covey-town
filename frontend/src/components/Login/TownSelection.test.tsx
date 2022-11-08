@@ -388,7 +388,7 @@ describe('Town Selection', () => {
           });
           await waitFor(() =>
             expect(mockToast).toBeCalledWith({
-              description: 'Please select a username',
+              description: 'Please select a password',
               title: 'Unable to join town',
               status: 'error',
             }),
@@ -449,11 +449,18 @@ describe('Town Selection', () => {
               if (row) {
                 const button = within(row).getByRole('button');
                 const username = nanoid();
+                const password = nanoid();
                 act(() => {
                   fireEvent.change(userNameField, { target: { value: username } });
                 });
                 await waitFor(() => {
                   expect(userNameField.value).toBe(username);
+                });
+                act(() => {
+                  fireEvent.change(passwordField, { target: { value: password } });
+                });
+                await waitFor(() => {
+                  expect(passwordField.value).toBe(password);
                 });
                 act(() => {
                   fireEvent.click(button);

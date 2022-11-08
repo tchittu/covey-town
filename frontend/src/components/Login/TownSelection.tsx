@@ -133,6 +133,14 @@ export default function TownSelection(): JSX.Element {
       });
       return;
     }
+    if (!password || password.length === 0) {
+      toast({
+        title: 'Unable to create town',
+        description: 'Please select a password before creating a town',
+        status: 'error',
+      });
+      return;
+    }
     if (!newTownName || newTownName.length === 0) {
       toast({
         title: 'Unable to create town',
