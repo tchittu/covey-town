@@ -27,6 +27,7 @@ import axios from 'axios';
 
 export default function TownSelection(): JSX.Element {
   const [userName, setUserName] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [newTownName, setNewTownName] = useState<string>('');
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);
   const [townIDToJoin, setTownIDToJoin] = useState<string>('');
@@ -61,6 +62,14 @@ export default function TownSelection(): JSX.Element {
           });
           return;
         }
+        if (!password || password.length === 0) {
+          toast({
+            title: 'Unable to join town',
+            description: 'Please select a password',
+            status: 'error',
+          });
+          return;
+        }
         if (!coveyRoomID || coveyRoomID.length === 0) {
           toast({
             title: 'Unable to join town',
@@ -83,7 +92,7 @@ export default function TownSelection(): JSX.Element {
         // try adding user to database
         const profile = {
           username: userName,
-          password: '',
+          password: password,
           avatar: '',
           aboutMe: '',
           friendsList: [],
@@ -112,7 +121,7 @@ export default function TownSelection(): JSX.Element {
         }
       }
     },
-    [setTownController, userName, toast, videoConnect, loginController],
+    [userName, password, loginController, videoConnect, setTownController, toast],
   );
 
   const handleCreate = async () => {
@@ -196,6 +205,22 @@ export default function TownSelection(): JSX.Element {
                 placeholder='Your name'
                 value={userName}
                 onChange={event => setUserName(event.target.value)}
+              />
+            </FormControl>
+          </Box>
+          <Box p='4' borderWidth='1px' borderRadius='lg'>
+            <Heading as='h2' size='lg'>
+              Select a password
+            </Heading>
+
+            <FormControl>
+              <FormLabel htmlFor='name'>Password</FormLabel>
+              <Input
+                autoFocus
+                name='password'
+                placeholder='Your password'
+                value={password}
+                onChange={event => setPassword(event.target.value)}
               />
             </FormControl>
           </Box>
