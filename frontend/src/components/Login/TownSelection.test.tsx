@@ -13,6 +13,7 @@ import { CancelablePromise, Town, TownsService } from '../../generated/client';
 import * as useLoginController from '../../hooks/useLoginController';
 import { mockTownController } from '../../TestUtils';
 import TownSelection from './TownSelection';
+import axios from 'axios';
 
 const mockConnect = jest.fn(() => Promise.resolve());
 
@@ -29,6 +30,8 @@ jest.mock('@chakra-ui/react', () => {
     useToast: mockUseToast,
   };
 });
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 function toCancelablePromise<T>(p: T): CancelablePromise<T> {
   return new CancelablePromise(async resolve => {
     resolve(p);
@@ -292,6 +295,7 @@ describe('Town Selection', () => {
     let renderData: RenderResult<typeof import('@testing-library/dom/types/queries')>;
     let townIDToJoinField: HTMLInputElement;
     let userNameField: HTMLInputElement;
+    let passwordField: HTMLInputElement;
     let joinTownByIDButton: HTMLElement;
     let expectedTowns: Town[];
     let newTownNameField: HTMLInputElement;
@@ -312,6 +316,7 @@ describe('Town Selection', () => {
         'ID of town to join, or select from list',
       ) as HTMLInputElement;
       userNameField = renderData.getByPlaceholderText('Your name') as HTMLInputElement;
+      passwordField = renderData.getByPlaceholderText('Your password') as HTMLInputElement;
       joinTownByIDButton = renderData.getByTestId('joinTownByIDButton');
       newTownIsPublicCheckbox = renderData.getByLabelText('Publicly Listed') as HTMLInputElement;
       newTownNameField = renderData.getByPlaceholderText('New Town Name') as HTMLInputElement;
@@ -319,10 +324,18 @@ describe('Town Selection', () => {
     });
     describe('Joining existing towns', () => {
       describe('Joining an existing town by ID', () => {
-        const joinTownWithOptions = async (params: { coveyTownID: string; userName: string }) => {
+        const joinTownWithOptions = async (params: {
+          coveyTownID: string;
+          userName: string;
+          password: string;
+        }) => {
           fireEvent.change(userNameField, { target: { value: params.userName } });
           await waitFor(() => {
             expect(userNameField.value).toBe(params.userName);
+          });
+          fireEvent.change(passwordField, { target: { value: params.password } });
+          await waitFor(() => {
+            expect(passwordField.value).toBe(params.password);
           });
           fireEvent.change(townIDToJoinField, { target: { value: params.coveyTownID } });
           await waitFor(() => expect(townIDToJoinField.value).toBe(params.coveyTownID));
@@ -332,10 +345,12 @@ describe('Town Selection', () => {
         it('includes a connect button, which creates a new TownController and connects with the entered username and coveyTownID', async () => {
           const coveyTownID = nanoid();
           const userName = nanoid();
+          const password = nanoid();
 
           await joinTownWithOptions({
             coveyTownID,
             userName,
+            password,
           });
 
           // Check for call sequence
@@ -357,6 +372,7 @@ describe('Town Selection', () => {
           await joinTownWithOptions({
             coveyTownID,
             userName: '',
+            password: 'pass',
           });
           await waitFor(() =>
             expect(mockToast).toBeCalledWith({
@@ -366,11 +382,28 @@ describe('Town Selection', () => {
             }),
           );
         });
+        it('displays an error toast "Unable to join town" if the password is empty', async () => {
+          const coveyTownID = nanoid();
+          await joinTownWithOptions({
+            coveyTownID,
+            userName: 'username',
+            password: '',
+          });
+          await waitFor(() =>
+            expect(mockToast).toBeCalledWith({
+              description: 'Please select a password',
+              title: 'Unable to join town',
+              status: 'error',
+            }),
+          );
+        });
         it('displays an error toast "Unable to join town" if the TownID is empty', async () => {
           const userName = nanoid();
+          const password = nanoid();
           await joinTownWithOptions({
             coveyTownID: '',
             userName,
+            password,
           });
           await waitFor(() =>
             expect(mockToast).toBeCalledWith({
@@ -384,6 +417,7 @@ describe('Town Selection', () => {
         it('displays an error toast "Unable to connect to Towns Service" if an error occurs', async () => {
           const coveyTownID = nanoid();
           const userName = nanoid();
+          const password = nanoid();
           const errorMessage = `Err${nanoid()}`;
 
           // Configure mocks
@@ -392,6 +426,7 @@ describe('Town Selection', () => {
           await joinTownWithOptions({
             coveyTownID,
             userName,
+            password,
           });
 
           // Check for call sequence
@@ -417,11 +452,28 @@ describe('Town Selection', () => {
               if (row) {
                 const button = within(row).getByRole('button');
                 const username = nanoid();
+                const password = nanoid();
+
+                const expectedResult = {
+                  username: username,
+                  password: password,
+                  avatar: '',
+                  aboutMe: '',
+                  friendsList: [],
+                };
+                mockedAxios.post.mockResolvedValue({ data: expectedResult });
+
                 act(() => {
                   fireEvent.change(userNameField, { target: { value: username } });
                 });
                 await waitFor(() => {
                   expect(userNameField.value).toBe(username);
+                });
+                act(() => {
+                  fireEvent.change(passwordField, { target: { value: password } });
+                });
+                await waitFor(() => {
+                  expect(passwordField.value).toBe(password);
                 });
                 act(() => {
                   fireEvent.click(button);
@@ -443,6 +495,7 @@ describe('Town Selection', () => {
                     mockedTownController,
                   ),
                 );
+                await waitFor(() => expect(mockedAxios.post).toHaveBeenCalled());
               } else {
                 fail(`Could not find row for town ${town.townID}`);
               }
@@ -479,6 +532,7 @@ describe('Town Selection', () => {
       const createTownWithOptions = async (params: {
         townName: string;
         userName: string;
+        password: string;
         togglePublicBox?: boolean;
         townID?: string;
         roomPassword?: string;
@@ -487,6 +541,10 @@ describe('Town Selection', () => {
         fireEvent.change(userNameField, { target: { value: params.userName } });
         await waitFor(() => {
           expect(userNameField.value).toBe(params.userName);
+        });
+        fireEvent.change(passwordField, { target: { value: params.password } });
+        await waitFor(() => {
+          expect(passwordField.value).toBe(params.password);
         });
         fireEvent.change(newTownNameField, { target: { value: params.townName } });
         await waitFor(() => expect(newTownNameField.value).toBe(params.townName));
@@ -514,6 +572,7 @@ describe('Town Selection', () => {
           it('displays an error toast "Unable to create town" if the username is empty', async () => {
             await createTownWithOptions({
               userName: '',
+              password: nanoid(),
               townName: nanoid(),
               errorMessage: 'FAIL',
             });
@@ -525,10 +584,26 @@ describe('Town Selection', () => {
               }),
             );
           });
+          it('displays an error toast "Unable to create town" if the password is empty', async () => {
+            await createTownWithOptions({
+              userName: nanoid(),
+              password: '',
+              townName: nanoid(),
+              errorMessage: 'FAIL',
+            });
+            await waitFor(() =>
+              expect(mockToast).toBeCalledWith({
+                title: 'Unable to create town',
+                description: 'Please select a password before creating a town',
+                status: 'error',
+              }),
+            );
+          });
           it('displays an error toast "Unable to create town" if the newTownName is empty', async () => {
             await createTownWithOptions({
               townName: '',
               userName: nanoid(),
+              password: nanoid(),
               errorMessage: 'FAIL',
             });
             await waitFor(() =>
@@ -548,6 +623,7 @@ describe('Town Selection', () => {
             await createTownWithOptions({
               townName,
               userName: nanoid(),
+              password: nanoid(),
               townID,
               roomPassword,
             });
@@ -566,6 +642,7 @@ describe('Town Selection', () => {
             await createTownWithOptions({
               townName,
               userName: nanoid(),
+              password: nanoid(),
               townID,
               roomPassword,
               togglePublicBox: true,
@@ -585,6 +662,7 @@ describe('Town Selection', () => {
             await createTownWithOptions({
               townName,
               userName: nanoid(),
+              password: nanoid(),
               townID,
               roomPassword,
               togglePublicBox: true,
@@ -610,12 +688,14 @@ describe('Town Selection', () => {
             const townID = nanoid();
             const roomPassword = nanoid();
             const userName = nanoid();
+            const password = nanoid();
             const townName = nanoid();
 
             // Create town
             await createTownWithOptions({
               townName,
               userName,
+              password,
               townID,
               roomPassword,
               togglePublicBox: true,
@@ -641,6 +721,7 @@ describe('Town Selection', () => {
             await createTownWithOptions({
               townName,
               userName: nanoid(),
+              password: nanoid(),
               errorMessage,
             });
             await waitFor(() =>

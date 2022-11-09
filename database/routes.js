@@ -46,6 +46,31 @@ profileRoutes.route("/profiles/add").post(function (req, response) {
   });
 });
 
+// Create a profile if it doesn't already exist
+profileRoutes.route("/profiles/retrieveOrAdd").post(function (req, response) {
+  let db_connect = dbo.getDb();
+  let myobj = {
+    username: req.body.username,
+    password: req.body.password,
+    avatar: req.body.avatar,
+    aboutMe: req.body.aboutMe,
+    friendsList: req.body.friendsList,
+  };
+
+  db_connect
+    .collection("profiles")
+    .findOneAndUpdate(
+      { username: req.body.username, password: req.body.password },
+      { $setOnInsert: myobj },
+      { upsert: true },
+      function (err, res) {
+        if (err) throw err;
+        console.log("Profile retrieved");
+        response.json(res);
+      }
+    );
+});
+
 // This section will help you update a profile by username.
 profileRoutes.route("/update/:username").post(function (req, response) {
   let db_connect = dbo.getDb();
