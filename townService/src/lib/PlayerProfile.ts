@@ -68,14 +68,14 @@ export default class PlayerProfile {
     this._aboutMe = newAboutMe;
   }
 
-  /** A list of players that are friends with this player */
-  private _friendsList: PlayerProfile[] = [];
+  /** A list of usernames of players that are friends with this player */
+  private _friendsList: string[] = [];
 
   public get friendsList() {
     return this._friendsList;
   }
 
-  public set friendsList(newList: PlayerProfile[]) {
+  public set friendsList(newList: string[]) {
     this._friendsList = newList;
   }
 
@@ -91,10 +91,10 @@ export default class PlayerProfile {
    * if the given player profile is this player, nothing happens.
    */
   public addFriend(friend: PlayerProfile): void {
-    const alreadyFriend = this.friendsList.find(player => player.id === friend.id);
-    const isThisPlayer = this.id === friend.id;
+    const alreadyFriend = this.friendsList.find(name => name === friend.username);
+    const isThisPlayer = this.username === friend.username;
     if (!alreadyFriend && !isThisPlayer) {
-      this._friendsList.push(friend);
+      this._friendsList.push(friend.username);
     }
   }
 
@@ -102,6 +102,6 @@ export default class PlayerProfile {
    * is not in the friend list, nothing happens.
    */
   public removeFriend(friend: PlayerProfile): void {
-    this.friendsList = this.friendsList.filter(player => player.id !== friend.id);
+    this.friendsList = this.friendsList.filter(name => name !== friend.username);
   }
 }

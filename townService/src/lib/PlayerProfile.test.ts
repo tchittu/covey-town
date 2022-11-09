@@ -68,18 +68,12 @@ describe('PlayerProfile', () => {
       expect(profile.friendsList.length).toEqual(0);
     });
     it('returns correct friendsList', () => {
-      const friend1 = new Player('friend1', townEmitter);
-      const friendProfile1 = new PlayerProfile(friend1, 'friendPassword1');
-      profile.friendsList = [friendProfile1];
-      expect(profile.friendsList).toEqual([friendProfile1]);
+      profile.friendsList = ['friend1'];
+      expect(profile.friendsList).toEqual(['friend1']);
     });
     it('sets to given friendsList', () => {
-      const friend1 = new Player('friend1', townEmitter);
-      const friendProfile1 = new PlayerProfile(friend1, 'friendPassword1');
-      const friend2 = new Player('friend1', townEmitter);
-      const friendProfile2 = new PlayerProfile(friend2, 'friendPassword2');
-      profile.friendsList = [friendProfile1, friendProfile2];
-      expect(profile.friendsList).toEqual([friendProfile1, friendProfile2]);
+      profile.friendsList = ['friend1', 'friend2'];
+      expect(profile.friendsList).toEqual(['friend1', 'friend2']);
       expect(profile.friendsList.length).toEqual(2);
     });
   });
@@ -88,16 +82,16 @@ describe('PlayerProfile', () => {
       const friend1 = new Player('friend1', townEmitter);
       const friendProfile1 = new PlayerProfile(friend1, 'friendPassword1');
       profile.addFriend(friendProfile1);
-      expect(profile.friendsList).toEqual([friendProfile1]);
+      expect(profile.friendsList).toEqual(['friend1']);
     });
     it('does nothing if the given player is already in the friendsList', () => {
       const friend1 = new Player('friend1', townEmitter);
       const friendProfile1 = new PlayerProfile(friend1, 'friendPassword1');
       profile.addFriend(friendProfile1);
-      expect(profile.friendsList).toEqual([friendProfile1]);
+      expect(profile.friendsList).toEqual(['friend1']);
       expect(() => profile.addFriend(friendProfile1)).not.toThrowError();
       profile.addFriend(friendProfile1);
-      expect(profile.friendsList).toEqual([friendProfile1]);
+      expect(profile.friendsList).toEqual(['friend1']);
     });
     it('does nothing if the given player is this player', () => {
       expect(() => profile.addFriend(profile)).not.toThrowError();
@@ -110,19 +104,19 @@ describe('PlayerProfile', () => {
       const friend1 = new Player('friend1', townEmitter);
       const friendProfile1 = new PlayerProfile(friend1, 'friendPassword1');
       profile.addFriend(friendProfile1);
-      expect(profile.friendsList).toEqual([friendProfile1]);
+      expect(profile.friendsList).toEqual(['friend1']);
       profile.removeFriend(friendProfile1);
       expect(profile.friendsList).toEqual([]);
     });
     it('does nothing if the given player is not in the friends list', () => {
       const friend1 = new Player('friend1', townEmitter);
       const friendProfile1 = new PlayerProfile(friend1, 'friendPassword1');
-      const friend2 = new Player('friend1', townEmitter);
+      const friend2 = new Player('friend2', townEmitter);
       const friendProfile2 = new PlayerProfile(friend2, 'friendPassword2');
       profile.addFriend(friendProfile2);
       expect(() => profile.removeFriend(friendProfile1)).not.toThrowError();
       profile.removeFriend(friendProfile1);
-      expect(profile.friendsList).toEqual([friendProfile2]);
+      expect(profile.friendsList).toEqual(['friend2']);
     });
   });
 });
