@@ -1,6 +1,5 @@
 const { MongoClient } = require("mongodb");
-const db =
-  "mongodb+srv://covey_town_user:cs4530@cluster0.bpcqjvf.mongodb.net/?retryWrites=true&w=majority";
+const db = process.env.ATLAS_URI;
 const client = new MongoClient(db, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -17,9 +16,10 @@ module.exports = {
       _db = client.db("CoveyTown");
     } catch (err) {
       console.log(err.stack);
-    } finally {
-      //   await client.close();
     }
+    // } finally {
+    //   //   await client.close();
+    // }
 
     // client.connect(function (err, db) {
     //   // Verify we got a good "db" object

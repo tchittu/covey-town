@@ -47,29 +47,57 @@ profileRoutes.route("/profiles/add").post(function (req, response) {
 });
 
 // Create a profile if it doesn't already exist
-profileRoutes.route("/profiles/retrieveOrAdd").post(function (req, response) {
-  let db_connect = dbo.getDb();
-  let myobj = {
-    username: req.body.username,
-    password: req.body.password,
-    avatar: req.body.avatar,
-    aboutMe: req.body.aboutMe,
-    friendsList: req.body.friendsList,
-  };
+profileRoutes
+  .route("/profiles/retrieveOrAdd")
+  .post(async function (req, response) {
+    let db_connect = dbo.getDb();
+    //   let myobj = {
+    //     username: req.body.username,
+    //     password: req.body.password,
+    //     avatar: req.body.avatar,
+    //     aboutMe: req.body.aboutMe,
+    //     friendsList: req.body.friendsList,
+    //   };
 
-  db_connect
-    .collection("profiles")
-    .findOneAndUpdate(
-      { username: req.body.username, password: req.body.password },
-      { $setOnInsert: myobj },
-      { upsert: true },
-      function (err, res) {
-        if (err) throw err;
-        console.log("Profile retrieved");
-        response.json(res);
+    //   db_connect
+    //     .collection("profiles")
+    //     .findOneAndUpdate(
+    //       { username: req.body.username, password: req.body.password },
+    //       { $setOnInsert: myobj },
+    //       { upsert: true },
+    //       function (err, res) {
+    //         if (err) throw err;
+    //         console.log("Profile retrieved");
+    //         response.json(res);
+    //       }
+    //     );
+
+    const result = await db_connect
+      .collection("profiles")
+      .findOne({ username: req.body.username });
+
+    if (result) {
+      if (result.password === req.body.password) {
+        console.log("Found profile");
+        response.json(result);
+      } else {
+        console.log("Incorrect password");
+        response.status(400).send("Incorrect password");
       }
-    );
-});
+    } else {
+      let myobj = {
+        username: req.body.username,
+        password: req.body.password,
+        avatar: req.body.avatar,
+        aboutMe: req.body.aboutMe,
+        friendsList: req.body.friendsList,
+      };
+      db_connect.collection("profiles").insertOne(myobj, function (err, res) {
+        if (err) throw err;
+        response.json(res);
+      });
+    }
+  });
 
 // This section will help you update a profile by username.
 profileRoutes.route("/update/:username").post(function (req, response) {

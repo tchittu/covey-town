@@ -23,7 +23,7 @@ import { Town } from '../../generated/client';
 import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export default function TownSelection(): JSX.Element {
   const [userName, setUserName] = useState<string>('');
@@ -78,6 +78,17 @@ export default function TownSelection(): JSX.Element {
           });
           return;
         }
+
+        const profile = {
+          username: userName,
+          password: password,
+          avatar: '',
+          aboutMe: '',
+          friendsList: [],
+        };
+
+        await axios.post('http://localhost:4000/profiles/retrieveOrAdd', profile);
+
         const newController = new TownController({
           userName,
           townID: coveyRoomID,
@@ -88,25 +99,14 @@ export default function TownSelection(): JSX.Element {
         assert(videoToken);
         await videoConnect(videoToken);
         setTownController(newController);
-
-        // try adding user to database
-        const profile = {
-          username: userName,
-          password: password,
-          avatar: '',
-          aboutMe: '',
-          friendsList: [],
-        };
-        await axios
-          .post('http://localhost:4000/profiles/retrieveOrAdd', profile)
-          .then(res => {
-            console.log(res.data);
-          })
-          .catch(error => {
-            console.log(error);
-          });
       } catch (err) {
-        if (err instanceof Error) {
+        if (err instanceof AxiosError) {
+          toast({
+            title: 'Error',
+            description: err.response?.data,
+            status: 'error',
+          });
+        } else if (err instanceof Error) {
           toast({
             title: 'Unable to connect to Towns Service',
             description: err.toString(),
@@ -150,6 +150,15 @@ export default function TownSelection(): JSX.Element {
       return;
     }
     try {
+      const profile = {
+        username: userName,
+        password: password,
+        avatar: '',
+        aboutMe: '',
+        friendsList: [],
+      };
+      await axios.post('http://localhost:4000/profiles/retrieveOrAdd', profile);
+
       const newTownInfo = await townsService.createTown({
         friendlyName: newTownName,
         isPubliclyListed: newTownIsPublic,
@@ -180,7 +189,13 @@ export default function TownSelection(): JSX.Element {
       });
       await handleJoin(newTownInfo.townID);
     } catch (err) {
-      if (err instanceof Error) {
+      if (err instanceof AxiosError) {
+        toast({
+          title: 'Error',
+          description: err.response?.data,
+          status: 'error',
+        });
+      } else if (err instanceof Error) {
         toast({
           title: 'Unable to connect to Towns Service',
           description: err.toString(),
