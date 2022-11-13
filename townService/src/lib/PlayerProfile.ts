@@ -1,3 +1,4 @@
+import fetch from 'node-fetch';
 import Player from './Player';
 
 const DEFAULT_AVATAR = 'DefaultAvatar.png';
@@ -103,5 +104,32 @@ export default class PlayerProfile {
    */
   public removeFriend(friend: PlayerProfile): void {
     this.friendsList = this.friendsList.filter(name => name !== friend.username);
+  }
+
+  /**
+   * Takes the current parameters of the player profile and returns it as a single
+   * object to be used to send to the database as JSON.
+   * @returns an object containing all the parametes of a player profile
+   */
+  public toJSON(): object {
+    const json = {
+      username: this.username,
+      password: this.password,
+      avatar: this._avatar,
+      aboutMe: this._aboutMe,
+      friendsList: this.friendsList,
+    };
+    return json;
+  }
+
+  /**
+   * API request using fetch to send the updated player profile information to our
+   * database.
+   */
+  public async updateProfileInDB(): Promise<void> {
+    await fetch('http://localhost:4000/profiles/update:username', {
+      method: 'PUT',
+      body: JSON.stringify(this.toJSON()),
+    });
   }
 }
