@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
-import { Player as PlayerModel, PlayerLocation } from '../types/CoveyTownSocket';
+import { Player as PlayerModel, PlayerLocation, PlayerProfile } from '../types/CoveyTownSocket';
 
 export type PlayerEvents = {
   movement: (newLocation: PlayerLocation) => void;
@@ -14,17 +14,25 @@ export type PlayerGameObjects = {
 export default class PlayerController extends (EventEmitter as new () => TypedEmitter<PlayerEvents>) {
   private _location: PlayerLocation;
 
+  private _profile: PlayerProfile;
+
   private readonly _id: string;
 
   private readonly _userName: string;
 
   public gameObjects?: PlayerGameObjects;
 
-  constructor(id: string, userName: string, location: PlayerLocation) {
+  constructor(
+    id: string,
+    userName: string,
+    location: PlayerLocation,
+    profile: PlayerProfile = { avatar: 'default', aboutMe: 'default', friendsList: [] },
+  ) {
     super();
     this._id = id;
     this._userName = userName;
     this._location = location;
+    this._profile = profile;
   }
 
   set location(newLocation: PlayerLocation) {
@@ -45,8 +53,12 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     return this._id;
   }
 
+  get profile(): PlayerProfile {
+    return this._profile;
+  }
+
   toPlayerModel(): PlayerModel {
-    return { id: this.id, userName: this.userName, location: this.location };
+    return { id: this.id, userName: this.userName, location: this.location, profile: this.profile };
   }
 
   private _updateGameComponentLocation() {
@@ -67,6 +79,11 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   }
 
   static fromPlayerModel(modelPlayer: PlayerModel): PlayerController {
-    return new PlayerController(modelPlayer.id, modelPlayer.userName, modelPlayer.location);
+    return new PlayerController(
+      modelPlayer.id,
+      modelPlayer.userName,
+      modelPlayer.location,
+      modelPlayer.profile,
+    );
   }
 }

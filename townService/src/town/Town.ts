@@ -11,6 +11,7 @@ import {
   CoveyTownSocket,
   Interactable,
   PlayerLocation,
+  PlayerProfile,
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
@@ -108,8 +109,12 @@ export default class Town {
    *
    * @param newPlayer The new player to add to the town
    */
-  async addPlayer(userName: string, socket: CoveyTownSocket): Promise<Player> {
-    const newPlayer = new Player(userName, socket.to(this._townID));
+  async addPlayer(
+    userName: string,
+    playerProfile: PlayerProfile,
+    socket: CoveyTownSocket,
+  ): Promise<Player> {
+    const newPlayer = new Player(userName, playerProfile, socket.to(this._townID));
     this._players.push(newPlayer);
 
     this._connectedSockets.add(socket);

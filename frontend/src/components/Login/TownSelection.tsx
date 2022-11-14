@@ -1,5 +1,3 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import assert from 'assert';
 import {
   Box,
   Button,
@@ -19,13 +17,18 @@ import {
   Tr,
   useToast,
 } from '@chakra-ui/react';
+import assert from 'assert';
+import React, { useCallback, useEffect, useState } from 'react';
+import TownController from '../../classes/TownController';
 import { Town } from '../../generated/client';
 import useLoginController from '../../hooks/useLoginController';
-import TownController from '../../classes/TownController';
+import { PlayerProfile } from '../../types/CoveyTownSocket';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 
 export default function TownSelection(): JSX.Element {
   const [userName, setUserName] = useState<string>('');
+  const [avatar, setAvatar] = useState<string>('');
+  const [aboutMe, setAboutMe] = useState<string>('');
   const [newTownName, setNewTownName] = useState<string>('');
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);
   const [townIDToJoin, setTownIDToJoin] = useState<string>('');
@@ -68,8 +71,14 @@ export default function TownSelection(): JSX.Element {
           });
           return;
         }
+        const playerProfile: PlayerProfile = {
+          avatar: avatar,
+          aboutMe: aboutMe,
+          friendsList: [],
+        };
         const newController = new TownController({
           userName,
+          playerProfile,
           townID: coveyRoomID,
           loginController,
         });
@@ -94,7 +103,7 @@ export default function TownSelection(): JSX.Element {
         }
       }
     },
-    [setTownController, userName, toast, videoConnect, loginController],
+    [setTownController, userName, avatar, aboutMe, toast, videoConnect, loginController],
   );
 
   const handleCreate = async () => {
@@ -178,6 +187,36 @@ export default function TownSelection(): JSX.Element {
                 placeholder='Your name'
                 value={userName}
                 onChange={event => setUserName(event.target.value)}
+              />
+            </FormControl>
+          </Box>
+          <Box p='4' borderWidth='1px' borderRadius='lg'>
+            <Heading as='h2' size='lg'>
+              Select an avatar
+            </Heading>
+
+            <FormControl>
+              <FormLabel htmlFor='avatar'>Avatar</FormLabel>
+              <Input
+                name='avatar'
+                placeholder='Your avatar'
+                value={avatar}
+                onChange={event => setAvatar(event.target.value)}
+              />
+            </FormControl>
+          </Box>
+          <Box p='4' borderWidth='1px' borderRadius='lg'>
+            <Heading as='h2' size='lg'>
+              Enter your about me
+            </Heading>
+
+            <FormControl>
+              <FormLabel htmlFor='aboutMe'>About Me</FormLabel>
+              <Input
+                name='aboutMe'
+                placeholder='Your info'
+                value={aboutMe}
+                onChange={event => setAboutMe(event.target.value)}
               />
             </FormControl>
           </Box>

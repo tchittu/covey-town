@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import React from 'react';
 import PlayerController from '../../classes/PlayerController';
 import TownController from '../../classes/TownController';
 import { PlayerLocation } from '../../types/CoveyTownSocket';
@@ -33,6 +34,12 @@ export default class TownGameScene extends Phaser.Scene {
   }
 
   private _players: PlayerController[] = [];
+
+  private _setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+
+  private _setOpenPlayer: React.Dispatch<React.SetStateAction<PlayerController | undefined>>;
+
+  private _setIsSelf: React.Dispatch<React.SetStateAction<boolean>>;
 
   private _interactables: Interactable[] = [];
 
@@ -79,11 +86,20 @@ export default class TownGameScene extends Phaser.Scene {
 
   private _resourcePathPrefix: string;
 
-  constructor(coveyTownController: TownController, resourcePathPrefix = '') {
+  constructor(
+    coveyTownController: TownController,
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    setOpenPlayer: React.Dispatch<React.SetStateAction<PlayerController | undefined>>,
+    setIsSelf: React.Dispatch<React.SetStateAction<boolean>>,
+    resourcePathPrefix = '',
+  ) {
     super('TownGameScene');
     this._resourcePathPrefix = resourcePathPrefix;
     this.coveyTownController = coveyTownController;
     this._players = this.coveyTownController.players;
+    this._setOpen = setOpen;
+    this._setOpenPlayer = setOpenPlayer;
+    this._setIsSelf = setIsSelf;
   }
 
   preload() {
@@ -344,10 +360,10 @@ export default class TownGameScene extends Phaser.Scene {
 
     // Object layers in Tiled let you embed extra info into a map - like a spawn point or custom
     // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
-    const spawnPoint = this.map.findObject(
+    const spawnPoint = (this.map.findObject(
       'Objects',
       obj => obj.name === 'Spawn Point',
-    ) as unknown as Phaser.GameObjects.Components.Transform;
+    ) as unknown) as Phaser.GameObjects.Components.Transform;
 
     const labels = this.map.filterObjects('Objects', obj => obj.name === 'label');
     labels.forEach(label => {
@@ -391,7 +407,20 @@ export default class TownGameScene extends Phaser.Scene {
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
       .setSize(30, 40)
       .setOffset(0, 24)
-      .setDepth(6);
+      .setDepth(6)
+      .setInteractive();
+    sprite.on('pointerdown', () => {
+      sprite.setTint(0xff0000);
+      this._setOpen(true);
+      this._setOpenPlayer(this.coveyTownController.ourPlayer);
+      this._setIsSelf(true);
+    });
+    sprite.on('pointerout', () => {
+      sprite.clearTint();
+    });
+    sprite.on('pointerup', () => {
+      sprite.clearTint();
+    });
     const label = this.add
       .text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
         font: '18px monospace',
@@ -495,7 +524,20 @@ export default class TownGameScene extends Phaser.Scene {
       const sprite = this.physics.add
         .sprite(player.location.x, player.location.y, 'atlas', 'misa-front')
         .setSize(30, 40)
-        .setOffset(0, 24);
+        .setOffset(0, 24)
+        .setInteractive();
+      sprite.on('pointerdown', () => {
+        sprite.setTint(0xff0000);
+        this._setOpen(true);
+        this._setOpenPlayer(player);
+        this._setIsSelf(false);
+      });
+      sprite.on('pointerout', () => {
+        sprite.clearTint();
+      });
+      sprite.on('pointerup', () => {
+        sprite.clearTint();
+      });
       const label = this.add.text(
         player.location.x,
         player.location.y - 20,

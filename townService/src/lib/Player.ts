@@ -1,5 +1,11 @@
 import { nanoid } from 'nanoid';
-import { Player as PlayerModel, PlayerLocation, TownEmitter } from '../types/CoveyTownSocket';
+import {
+  Player as PlayerModel,
+  PlayerProfile as PlayerProfileModel,
+  PlayerLocation,
+  TownEmitter,
+} from '../types/CoveyTownSocket';
+import PlayerProfile from './PlayerProfile';
 
 /**
  * Each user who is connected to a town is represented by a Player object
@@ -20,10 +26,12 @@ export default class Player {
   /** The secret token that allows this client to access our video resources for this town * */
   private _videoToken?: string;
 
+  private _playerProfile: PlayerProfile;
+
   /** A special town emitter that will emit events to the entire town BUT NOT to this player */
   public readonly townEmitter: TownEmitter;
 
-  constructor(userName: string, townEmitter: TownEmitter) {
+  constructor(userName: string, playerProfileModel: PlayerProfileModel, townEmitter: TownEmitter) {
     this.location = {
       x: 0,
       y: 0,
@@ -33,6 +41,10 @@ export default class Player {
     this._userName = userName;
     this._id = nanoid();
     this._sessionToken = nanoid();
+    const playerProfile = new PlayerProfile(this, 'temp_pass');
+    playerProfile.avatar = playerProfileModel.avatar;
+    playerProfile.aboutMe = playerProfileModel.aboutMe;
+    this._playerProfile = playerProfile;
     this.townEmitter = townEmitter;
   }
 
@@ -61,6 +73,7 @@ export default class Player {
       id: this._id,
       location: this.location,
       userName: this._userName,
+      profile: this._playerProfile.toProfileModel(),
     };
   }
 }

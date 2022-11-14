@@ -1,13 +1,19 @@
-import React from 'react';
 import Phaser from 'phaser';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
+import PlayerController from '../../classes/PlayerController';
 import useTownController from '../../hooks/useTownController';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import NewConversationModal from './interactables/NewCoversationModal';
+import ProfileModal from './interactables/ProfileModal';
+import SelfProfileModal from './interactables/SelfProfileModal';
 import TownGameScene from './TownGameScene';
 
 export default function TownMap(): JSX.Element {
   const coveyTownController = useTownController();
+  const [openProfile, setOpenProfile] = React.useState(false);
+  const [openPlayer, setOpenPlayer] = React.useState<PlayerController>();
+  const [isSelf, setIsSelf] = React.useState(false);
+  const handleClose = () => setOpenProfile(false);
 
   useEffect(() => {
     const config = {
@@ -30,9 +36,15 @@ export default function TownMap(): JSX.Element {
         },
       },
     };
+    console.log('CTC changed');
 
     const game = new Phaser.Game(config);
-    const newGameScene = new TownGameScene(coveyTownController);
+    const newGameScene = new TownGameScene(
+      coveyTownController,
+      setOpenProfile,
+      setOpenPlayer,
+      setIsSelf,
+    );
     game.scene.add('coveyBoard', newGameScene, true);
     const pauseListener = newGameScene.pause.bind(newGameScene);
     const unPauseListener = newGameScene.resume.bind(newGameScene);
@@ -45,13 +57,19 @@ export default function TownMap(): JSX.Element {
     };
   }, [coveyTownController]);
 
-  return (
+  return isSelf ? (
     <div id='app-container'>
       <NewConversationModal />
+      <SelfProfileModal open={openProfile} openPlayer={openPlayer} handleClick={handleClose} />
       <div id='map-container' />
-      <div id='social-container'>
-        <SocialSidebar />
-      </div>
+      <SocialSidebar />
+    </div>
+  ) : (
+    <div id='app-container'>
+      <NewConversationModal />
+      <ProfileModal open={openProfile} openPlayer={openPlayer} handleClick={handleClose} />
+      <div id='map-container' />
+      <SocialSidebar />
     </div>
   );
 }

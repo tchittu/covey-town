@@ -16,6 +16,7 @@ import {
 
 import { Town, TownCreateParams, TownCreateResponse } from '../api/Model';
 import InvalidParametersError from '../lib/InvalidParametersError';
+import { PlayerProfile as PlayerProfileModel } from '../types/CoveyTownSocket';
 import CoveyTownsStore from '../lib/TownsStore';
 import {
   ConversationArea,
@@ -170,7 +171,11 @@ export class TownsController extends Controller {
    */
   public async joinTown(socket: CoveyTownSocket) {
     // Parse the client's requested username from the connection
-    const { userName, townID } = socket.handshake.auth as { userName: string; townID: string };
+    const { userName, playerProfile, townID } = socket.handshake.auth as {
+      userName: string;
+      playerProfile: PlayerProfileModel;
+      townID: string;
+    };
 
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
@@ -181,7 +186,7 @@ export class TownsController extends Controller {
     // Connect the client to the socket.io broadcast room for this town
     socket.join(town.townID);
 
-    const newPlayer = await town.addPlayer(userName, socket);
+    const newPlayer = await town.addPlayer(userName, playerProfile, socket);
     assert(newPlayer.videoToken);
     socket.emit('initialize', {
       userID: newPlayer.id,
