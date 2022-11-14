@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import axios from 'axios';
 import Player from './Player';
 
 const DEFAULT_AVATAR = 'DefaultAvatar.png';
@@ -56,6 +56,7 @@ export default class PlayerProfile {
 
   public set avatar(newAvatar: string) {
     this._avatar = newAvatar;
+    this._updateProfileInDB();
   }
 
   /** Information about this player that will be displayed to other players */
@@ -67,6 +68,7 @@ export default class PlayerProfile {
 
   public set aboutMe(newAboutMe: string) {
     this._aboutMe = newAboutMe;
+    this._updateProfileInDB();
   }
 
   /** A list of usernames of players that are friends with this player */
@@ -78,6 +80,7 @@ export default class PlayerProfile {
 
   public set friendsList(newList: string[]) {
     this._friendsList = newList;
+    this._updateProfileInDB();
   }
 
   constructor(player: Player, password: string) {
@@ -97,6 +100,7 @@ export default class PlayerProfile {
     if (!alreadyFriend && !isThisPlayer) {
       this._friendsList.push(friend.username);
     }
+    this._updateProfileInDB();
   }
 
   /** Removes the given friend from this player's friend list if it is in the list. If the given player
@@ -104,6 +108,7 @@ export default class PlayerProfile {
    */
   public removeFriend(friend: PlayerProfile): void {
     this.friendsList = this.friendsList.filter(name => name !== friend.username);
+    this._updateProfileInDB();
   }
 
   /**
@@ -111,25 +116,22 @@ export default class PlayerProfile {
    * object to be used to send to the database as JSON.
    * @returns an object containing all the parametes of a player profile
    */
-  public toJSON(): object {
-    const json = {
+  private _toJSONObj(): object {
+    const jsonObj = {
       username: this.username,
       password: this.password,
       avatar: this._avatar,
       aboutMe: this._aboutMe,
       friendsList: this.friendsList,
     };
-    return json;
+    return jsonObj;
   }
 
   /**
-   * API request using fetch to send the updated player profile information to our
-   * database.
+   * API request using axios to send the updated player profile information to our
+   * database and update based on the profile username
    */
-  public async updateProfileInDB(): Promise<void> {
-    await fetch('http://localhost:4000/profiles/update:username', {
-      method: 'PUT',
-      body: JSON.stringify(this.toJSON()),
-    });
+  private async _updateProfileInDB(): Promise<void> {
+    await axios.put('http://localhost:4000/profiles/update:username', this._toJSONObj());
   }
 }
