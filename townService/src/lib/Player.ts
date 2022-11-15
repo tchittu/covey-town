@@ -41,7 +41,7 @@ export default class Player {
     this._userName = userName;
     this._id = nanoid();
     this._sessionToken = nanoid();
-    const playerProfile = new PlayerProfile(this, 'temp_pass');
+    const playerProfile = new PlayerProfile('temp_username', 'temp_pass');
     playerProfile.avatar = playerProfileModel.avatar;
     playerProfile.aboutMe = playerProfileModel.aboutMe;
     this._playerProfile = playerProfile;

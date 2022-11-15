@@ -1,31 +1,9 @@
 import axios from 'axios';
-import Player from './Player';
 import { PlayerProfile as PlayerProfileModel } from '../types/CoveyTownSocket';
 
 const DEFAULT_AVATAR = 'DefaultAvatar.png';
 
-const DEFAULT_AVATAR = 'DefaultAvatar.png';
-
 export default class PlayerProfile {
-  /** The identifier for this player profile. When a player logs on, this id will be set to
-   * match the id of the corresponding Player object */
-  private readonly _id: string;
-
-  public get id() {
-    return this._id;
-  }
-
-  /** The Player object that represents this player profile when the user is logged on */
-  private _player: Player;
-
-  public get player() {
-    return this._player;
-  }
-
-  public set player(newPlayer: Player) {
-    this._player = newPlayer;
-  }
-
   /** The username of the player which matches the username field of the corresponding Player object */
   private _username: string;
 
@@ -74,11 +52,7 @@ export default class PlayerProfile {
     this._updateProfileInDB();
   }
 
-<<<<<<< HEAD
   /** A list of usernames of players that are friends with this player */
-=======
-  /** A list of players that are friends with this player */
->>>>>>> frontend_sprite_clicking
   private _friendsList: string[] = [];
 
   public get friendsList() {
@@ -90,10 +64,8 @@ export default class PlayerProfile {
     this._updateProfileInDB();
   }
 
-  constructor(player: Player, password: string) {
-    this._id = player.id;
-    this._player = player;
-    this._username = player.userName;
+  constructor(userName: string, password: string) {
+    this._username = userName;
     this._password = password;
   }
 
@@ -101,7 +73,6 @@ export default class PlayerProfile {
    * given player is not this player. If the given player profile is already in the friend list or
    * if the given player profile is this player, nothing happens.
    */
-<<<<<<< HEAD
   public addFriend(friend: PlayerProfile): void {
     const alreadyFriend = this.friendsList.find(name => name === friend.username);
     const isThisPlayer = this.username === friend.username;
@@ -109,20 +80,11 @@ export default class PlayerProfile {
       this._friendsList.push(friend.username);
     }
     this._updateProfileInDB();
-=======
-  public addFriend(givenId: string): void {
-    const alreadyFriend = this.friendsList.find(id => givenId === id);
-    const isThisPlayer = this.id === givenId;
-    if (!alreadyFriend && !isThisPlayer) {
-      this._friendsList.push(givenId);
-    }
->>>>>>> frontend_sprite_clicking
   }
 
   /** Removes the given friend from this player's friend list if it is in the list. If the given player
    * is not in the friend list, nothing happens.
    */
-<<<<<<< HEAD
   public removeFriend(friend: PlayerProfile): void {
     this.friendsList = this.friendsList.filter(name => name !== friend.username);
     this._updateProfileInDB();
@@ -150,17 +112,13 @@ export default class PlayerProfile {
    */
   private async _updateProfileInDB(): Promise<void> {
     await axios.put('http://localhost:4000/profiles/update:username', this._toJSONObj());
-=======
-  public removeFriend(givenId: string): void {
-    this.friendsList = this.friendsList.filter(id => id !== givenId);
   }
 
-  toProfileModel(): PlayerProfileModel {
+  public toProfileModel(): PlayerProfileModel {
     return {
       avatar: this._avatar,
       aboutMe: this._aboutMe,
       friendsList: this._friendsList,
     };
->>>>>>> frontend_sprite_clicking
   }
 }
