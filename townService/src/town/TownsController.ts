@@ -16,14 +16,14 @@ import {
 
 import { Town, TownCreateParams, TownCreateResponse } from '../api/Model';
 import InvalidParametersError from '../lib/InvalidParametersError';
-import { PlayerProfile as PlayerProfileModel } from '../types/CoveyTownSocket';
-import CoveyTownsStore from '../lib/TownsStore';
 import {
+  PlayerProfile as PlayerProfileModel,
   ConversationArea,
   CoveyTownSocket,
   TownSettingsUpdate,
   ViewingArea,
 } from '../types/CoveyTownSocket';
+import CoveyTownsStore from '../lib/TownsStore';
 
 /**
  * This is the town route
