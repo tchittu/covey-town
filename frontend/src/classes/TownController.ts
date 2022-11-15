@@ -13,6 +13,7 @@ import {
   ChatMessage,
   CoveyTownSocket,
   PlayerLocation,
+  PlayerProfile,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
@@ -25,6 +26,7 @@ const CALCULATE_NEARBY_PLAYERS_DELAY = 300;
 
 export type ConnectionProperties = {
   userName: string;
+  playerProfile: PlayerProfile;
   townID: string;
   loginController: LoginController;
 };
@@ -154,6 +156,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   private readonly _userName: string;
 
+  private _playerProfile: PlayerProfile;
+
   /**
    * The user ID of the player whose browser created this TownController. The user ID is set by the backend townsService, and
    * is only available after the service is connected.
@@ -190,10 +194,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   private _viewingAreas: ViewingAreaController[] = [];
 
-  public constructor({ userName, townID, loginController }: ConnectionProperties) {
+  public constructor({ userName, playerProfile, townID, loginController }: ConnectionProperties) {
     super();
     this._townID = townID;
     this._userName = userName;
+    this._playerProfile = playerProfile;
     this._loginController = loginController;
 
     /*
@@ -205,7 +210,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
     const url = process.env.REACT_APP_TOWNS_SERVICE_URL;
     assert(url);
-    this._socket = io(url, { auth: { userName, townID } });
+    this._socket = io(url, { auth: { userName, townID, playerProfile } });
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
     this.registerSocketListeners();
   }

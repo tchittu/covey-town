@@ -1,18 +1,18 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import '@testing-library/jest-dom';
 import { findAllByRole, render, RenderResult, waitFor } from '@testing-library/react';
+import { mock, mockClear } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import ConversationAreaController from '../../classes/ConversationAreaController';
 import PlayerController from '../../classes/PlayerController';
-import ConversationAreasList from './ConversationAreasList';
 import TownController from '../../classes/TownController';
 import { LoginController } from '../../contexts/LoginControllerContext';
-import { mock, mockClear } from 'jest-mock-extended';
-import { BoundingBox, CoveyTownSocket } from '../../types/CoveyTownSocket';
-import { getEventListener, mockTownControllerConnection } from '../../TestUtils';
 import TownControllerContext from '../../contexts/TownControllerContext';
+import { getEventListener, mockTownControllerConnection } from '../../TestUtils';
+import { BoundingBox, CoveyTownSocket } from '../../types/CoveyTownSocket';
+import ConversationAreasList from './ConversationAreasList';
 
 /**
  * Mocks the socket-io client constructor such that it will always return the same
@@ -141,6 +141,11 @@ describe('ConversationAreasList', () => {
               rotation: 'front',
               moving: false,
             },
+            {
+              avatar: 'funny_image_avatar_lol',
+              aboutMe: 'i am funny',
+              friendsList: [],
+            },
           ),
         );
       }
@@ -161,6 +166,7 @@ describe('ConversationAreasList', () => {
       testController = new TownController({
         userName: nanoid(),
         townID: nanoid(),
+        playerProfile: { avatar: '', aboutMe: '', friendsList: [] },
         loginController: mock<LoginController>(),
       });
       if (areasToRender === undefined) {

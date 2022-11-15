@@ -1,5 +1,3 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import assert from 'assert';
 import {
   Box,
   Button,
@@ -19,9 +17,12 @@ import {
   Tr,
   useToast,
 } from '@chakra-ui/react';
+import assert from 'assert';
+import React, { useCallback, useEffect, useState } from 'react';
+import TownController from '../../classes/TownController';
 import { Town } from '../../generated/client';
 import useLoginController from '../../hooks/useLoginController';
-import TownController from '../../classes/TownController';
+import { PlayerProfile } from '../../types/CoveyTownSocket';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 import axios from 'axios';
 
@@ -78,8 +79,14 @@ export default function TownSelection(): JSX.Element {
           });
           return;
         }
+        const playerProfile: PlayerProfile = {
+          avatar: '',
+          aboutMe: 'aboutMe',
+          friendsList: [],
+        };
         const newController = new TownController({
           userName,
+          playerProfile,
           townID: coveyRoomID,
           loginController,
         });
@@ -121,7 +128,7 @@ export default function TownSelection(): JSX.Element {
         }
       }
     },
-    [setTownController, userName, password, toast, videoConnect, loginController],
+    [userName, password, loginController, videoConnect, setTownController, toast],
   );
 
   const handleCreate = async () => {

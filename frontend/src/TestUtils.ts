@@ -44,8 +44,9 @@ export type ReceivedEventListener<EventName extends ReceivedEvent> = ReservedOrU
  * Due to TS-41778 it is a pain to make this work for reserved events too (e.g. disconnect), so this will only work for our user-defined events,
  * but this is probably OK anyway because those are what we most want to test! https://github.com/microsoft/TypeScript/issues/41778
  */
-export type ReceivedEventParameter<EventName extends EventNames<ServerToClientEvents>> =
-  EventParams<ServerToClientEvents, EventName>[0];
+export type ReceivedEventParameter<
+  EventName extends EventNames<ServerToClientEvents>
+> = EventParams<ServerToClientEvents, EventName>[0];
 
 /**
  * Given a mocked CoveyTownSocket, return the first event listener that was registered for a given event
@@ -62,7 +63,7 @@ export function getEventListener<Ev extends ReceivedEvent>(
   if (ret) {
     const param = ret[1];
     if (param) {
-      return param as unknown as ReservedOrUserListener<
+      return (param as unknown) as ReservedOrUserListener<
         SocketReservedEventsMap,
         ServerToClientEvents,
         Ev
@@ -152,6 +153,7 @@ export async function mockTownControllerConnection(
           id: ourUserID,
           userName: testController.userName,
           location: { moving: false, x: 0, y: 0, rotation: 'back' },
+          profile: { avatar: 'default', aboutMe: 'default', friendsList: [] },
         },
       ],
       friendlyName: nanoid(),
@@ -171,6 +173,7 @@ export async function mockTownControllerConnection(
         id: playerID,
         userName: nanoid(),
         location: { moving: false, x: 0, y: 0, rotation: 'back' },
+        profile: { avatar: 'default', aboutMe: 'default', friendsList: [] },
       });
       responseToSendController.interactables.push({
         id: nanoid(),
@@ -218,7 +221,7 @@ export function getTownEventListener<Ev extends EventNames<TownEvents>>(
   if (ret) {
     const param = ret[1];
     if (param) {
-      return param as unknown as TownEvents[Ev];
+      return (param as unknown) as TownEvents[Ev];
     }
   }
   throw new Error(`No event listener found for event ${eventName}`);

@@ -49,6 +49,7 @@
         "npm": "8.x.x"
     },
     "dependencies": {
+        "@chakra-ui/icons": "^2.0.11",
         "@types/ramda": "^0.27.34",
         "cors": "^2.8.5",
         "dotenv": "^16.0.3",
