@@ -45,7 +45,7 @@ export type ReceivedEventListener<EventName extends ReceivedEvent> = ReservedOrU
  * but this is probably OK anyway because those are what we most want to test! https://github.com/microsoft/TypeScript/issues/41778
  */
 export type ReceivedEventParameter<EventName extends EventNames<ServerToClientEvents>> =
- EventParams<ServerToClientEvents, EventName>[0];
+  EventParams<ServerToClientEvents, EventName>[0];
 
 /**
  * Given a mocked CoveyTownSocket, return the first event listener that was registered for a given event
