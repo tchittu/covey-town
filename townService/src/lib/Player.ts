@@ -44,6 +44,7 @@ export default class Player {
     const playerProfile = new PlayerProfile(this, 'temp_pass');
     playerProfile.avatar = playerProfileModel.avatar;
     playerProfile.aboutMe = playerProfileModel.aboutMe;
+    playerProfile.friendsList = playerProfileModel.friendsList;
     this._playerProfile = playerProfile;
     this.townEmitter = townEmitter;
   }

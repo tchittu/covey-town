@@ -1,10 +1,19 @@
+import { AddIcon } from '@chakra-ui/icons';
 import {
   Avatar,
-  Badge,
   Box,
   Button,
+  ButtonGroup,
   Center,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
   Heading,
+  HStack,
+  IconButton,
   Modal,
   ModalCloseButton,
   ModalContent,
@@ -12,6 +21,8 @@ import {
   Stack,
   Text,
   useColorModeValue,
+  useDisclosure,
+  VStack,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect } from 'react';
 import PlayerController from '../../../classes/PlayerController';
@@ -25,6 +36,7 @@ interface ProfileModalProps {
 
 export default function ProfileModal(props: ProfileModalProps): JSX.Element {
   const coveyTownController = useTownController();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     if (props.open) {
@@ -86,17 +98,43 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
               mt={6}>
               {props.openPlayer?.profile.aboutMe}
             </Text>
-            <Stack align={'center'} justify={'center'} direction={'row'} mt={6}>
-              <Badge px={2} py={1} bg={useColorModeValue('gray.50', 'gray.800')} fontWeight={'400'}>
-                #art
-              </Badge>
-              <Badge px={2} py={1} bg={useColorModeValue('gray.50', 'gray.800')} fontWeight={'400'}>
-                #photography
-              </Badge>
-              <Badge px={2} py={1} bg={useColorModeValue('gray.50', 'gray.800')} fontWeight={'400'}>
-                #music
-              </Badge>
-            </Stack>
+            <Box>
+              <Button colorScheme='teal' variant='ghost' onClick={onOpen}>
+                {props.openPlayer?.profile.friendsList.length === 0
+                  ? 'No'
+                  : props.openPlayer?.profile.friendsList.length}{' '}
+                Friends
+              </Button>
+              <Drawer isOpen={isOpen} placement='right' onClose={onClose}>
+                <DrawerOverlay />
+                <DrawerContent>
+                  <DrawerCloseButton />
+                  <DrawerHeader>{props.openPlayer?.userName + "'s Friends"}</DrawerHeader>
+
+                  <DrawerBody>
+                    <VStack w={400} spacing={4} align='start'>
+                      {props.openPlayer?.profile.friendsList.map(friend => {
+                        return (
+                          <HStack key={friend} spacing={3}>
+                            <Avatar />
+                            <Heading fontSize={18} color='teal.900'>
+                              {friend}
+                            </Heading>
+                            <ButtonGroup>
+                              <IconButton
+                                aria-label='Add to friends'
+                                size='xs'
+                                icon={<AddIcon />}
+                              />
+                            </ButtonGroup>
+                          </HStack>
+                        );
+                      })}
+                    </VStack>
+                  </DrawerBody>
+                </DrawerContent>
+              </Drawer>
+            </Box>
 
             <Stack mt={8} direction={'row'} spacing={4}>
               <Button
