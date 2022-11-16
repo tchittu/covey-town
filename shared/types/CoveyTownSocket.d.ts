@@ -85,10 +85,12 @@ export interface ServerToClientEvents {
   townClosing: () => void;
   chatMessage: (message: ChatMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
+  playerUpdated: (updatedPlayer: Player) => void;
 }
 
 export interface ClientToServerEvents {
   chatMessage: (message: ChatMessage) => void;
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
+  playerUpdate: (newPlayerProfile: PlayerProfile) => void;
 }

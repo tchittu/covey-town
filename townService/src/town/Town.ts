@@ -161,9 +161,12 @@ export default class Town {
         }
       }
     });
+
+    socket.on('playerUpdate', (newPlayerProfile: PlayerProfile) => {
+      this._updatePlayer(newPlayer, newPlayerProfile);
+    });
     return newPlayer;
   }
-
   /**
    * Destroys all data related to a player in this town.
    *
@@ -177,6 +180,10 @@ export default class Town {
     }
   }
 
+  private _updatePlayer(player: Player, playerProfile: PlayerProfile): void {
+    player.updateProfile(playerProfile);
+    this._broadcastEmitter.emit('playerUpdated', player.toPlayerModel());
+  }
   /**
    * Updates the location of a player within the town
    *

@@ -404,6 +404,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       }
     });
 
+    this._socket.on('playerUpdated', updatedPlayer => {
+      const playerToUpdate = this.players.find(eachPlayer => eachPlayer.id === updatedPlayer.id);
+      if (playerToUpdate) {
+        playerToUpdate.profile = updatedPlayer.profile;
+      }
+    });
+
     /**
      * When an interactable's state changes, push that update into the relevant controller, which is assumed
      * to be either a Viewing Area or a Conversation Area, and which is assumed to already be represented by a
@@ -451,6 +458,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     assert(ourPlayer);
     ourPlayer.location = newLocation;
     this.emit('playerMoved', ourPlayer);
+  }
+
+  public emitPlayerUpdate(newPlayerProfile: PlayerProfile) {
+    this._socket.emit('playerUpdate', newPlayerProfile);
+    const ourPlayer = this._ourPlayer;
+    assert(ourPlayer);
+    ourPlayer.profile = newPlayerProfile;
   }
 
   /**

@@ -549,6 +549,7 @@ export default class TownGameScene extends Phaser.Scene {
           backgroundColor: '#ffffff',
         },
       );
+      console.log('here');
       player.gameObjects = {
         sprite,
         label,

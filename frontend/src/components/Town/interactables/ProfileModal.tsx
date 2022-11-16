@@ -13,15 +13,39 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import React from 'react';
-import { ProfileModalProps } from './ProfileModalProps';
+import React, { useCallback, useEffect } from 'react';
+import PlayerController from '../../../classes/PlayerController';
+import useTownController from '../../../hooks/useTownController';
+
+interface ProfileModalProps {
+  open: boolean;
+  openPlayer: PlayerController | undefined;
+  handleClick: () => void;
+}
 
 export default function ProfileModal(props: ProfileModalProps): JSX.Element {
+  const coveyTownController = useTownController();
+
+  useEffect(() => {
+    if (props.open) {
+      coveyTownController.pause();
+    } else {
+      coveyTownController.unPause();
+    }
+  }, [coveyTownController, props.open]);
+
+  const closeModal = useCallback(() => {
+    coveyTownController.unPause();
+    props.handleClick();
+  }, [coveyTownController, props.handleClick]);
   return (
     <Modal
       closeOnOverlayClick={false}
       isOpen={props.open}
-      onClose={props.handleClick}
+      onClose={() => {
+        closeModal();
+        coveyTownController.unPause();
+      }}
       useInert={true}>
       <ModalOverlay />
       <ModalContent maxW={'400px'}>
@@ -37,11 +61,7 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
             textAlign={'center'}>
             <Avatar
               size={'xl'}
-              src={
-                props.openPlayer?.profile.avatar
-                //'https://images.unsplash.com/photo-1520810627419-35e362c5dc07?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ'
-              }
-              //alt={'Avatar Alt'}
+              src={props.openPlayer?.profile.avatar}
               mb={4}
               pos={'relative'}
               _after={{

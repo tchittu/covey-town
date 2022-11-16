@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   Avatar,
   Button,
@@ -6,82 +7,229 @@ import {
   FormControl,
   FormLabel,
   Heading,
-  Input,
   Modal,
   ModalCloseButton,
   ModalContent,
   ModalOverlay,
   Stack,
+  Text,
   Textarea,
   useColorModeValue,
+  useToast,
 } from '@chakra-ui/react';
-import React from 'react';
-import { ProfileModalProps } from './ProfileModalProps';
+import React, { useCallback, useEffect, useState } from 'react';
+import ImageUploading, { ImageListType } from 'react-images-uploading';
+import PlayerController from '../../../classes/PlayerController';
+import useTownController from '../../../hooks/useTownController';
 
-export default function ProfileModal(props: ProfileModalProps): JSX.Element {
+const MAX_IMAGE_SIZE = 209715;
+interface SelfProfileModalProps {
+  open: boolean;
+  openPlayer: PlayerController | undefined;
+  handleClick: () => void;
+  updateData: (avatar: string | undefined, aboutMe: string) => void;
+}
+
+export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Element {
+  const [images, setImages] = useState([]);
+  const [aboutMe, setAboutMe] = useState('');
+  const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
+    // data for submit
+    console.log(imageList, addUpdateIndex);
+    setImages(imageList as never[]);
+  };
+
+  const toast = useToast();
+  const coveyTownController = useTownController();
+
+  useEffect(() => {
+    if (props.open) {
+      coveyTownController.pause();
+    } else {
+      coveyTownController.unPause();
+    }
+  }, [coveyTownController, props.open]);
+
+  const closeModal = useCallback(() => {
+    coveyTownController.unPause();
+    props.handleClick();
+  }, [coveyTownController, props.handleClick]);
+
   return (
-    <Modal closeOnOverlayClick={false} isOpen={props.open} onClose={props.handleClick}>
+    <Modal
+      closeOnOverlayClick={false}
+      isOpen={props.open}
+      onClose={() => {
+        closeModal();
+        coveyTownController.unPause();
+      }}>
       <ModalOverlay />
       <ModalContent>
         <ModalCloseButton autoFocus={false} />
         <Flex align={'center'} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
-          <Stack
-            spacing={4}
-            w={'full'}
-            maxW={'md'}
-            bg={useColorModeValue('white', 'gray.700')}
-            rounded={'xl'}
-            boxShadow={'lg'}
-            p={6}>
-            <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
-              User Profile Edit
-            </Heading>
-            <FormControl id='userName'>
-              <FormLabel>User Avatar</FormLabel>
-              <Stack direction={['column', 'row']} spacing={6}>
-                <Center>
-                  <Avatar size='xl' src={props.openPlayer?.profile.avatar}></Avatar>
-                </Center>
-                <Center w='full'>
-                  <Button w='full'>Change Avatar</Button>
-                </Center>
+          <ImageUploading
+            value={images}
+            onChange={onChange}
+            dataURLKey='data_url'
+            maxFileSize={MAX_IMAGE_SIZE}
+            onError={(errors, files) => {
+              console.log('Error: ', errors);
+              toast({
+                title: 'Error uploading image',
+                description: errors && (
+                  <div>
+                    {errors.maxNumber && <span>Number of selected images exceed maxNumber</span>}
+                    {errors.acceptType && <span>Your selected file type is not allow</span>}
+                    {errors.maxFileSize && (
+                      <span>Selected file size exceed maxFileSize: {MAX_IMAGE_SIZE} bytes</span>
+                    )}
+                    {errors.resolution && (
+                      <span>Selected file is not match your desired resolution</span>
+                    )}
+                  </div>
+                ),
+                status: 'error',
+                isClosable: true,
+                duration: 4000,
+              });
+            }}>
+            {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove }) => (
+              <Stack
+                spacing={4}
+                w={'full'}
+                maxW={'md'}
+                bg={useColorModeValue('white', 'gray.700')}
+                rounded={'xl'}
+                boxShadow={'lg'}
+                p={6}>
+                <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
+                  User Profile Edit
+                </Heading>
+                <FormControl id='userName'>
+                  <FormLabel>User Avatar</FormLabel>
+                  <Stack direction={['column', 'row']} spacing={6}>
+                    <Center>
+                      <div className='image-item'>
+                        <Avatar
+                          size='xl'
+                          src={
+                            imageList.length === 0
+                              ? props.openPlayer?.profile.avatar
+                              : imageList[0]['data_url']
+                          }></Avatar>
+                      </div>
+                    </Center>
+                    <Center w='full'>
+                      <Button w='full' onClick={onImageUpload}>
+                        Change Avatar
+                      </Button>
+                    </Center>
+                  </Stack>
+                </FormControl>
+                <Text fontSize='xl' as='b'>
+                  {props.openPlayer?.userName}
+                </Text>
+                <FormControl id='aboutMe' isRequired={false}>
+                  <FormLabel>About Me</FormLabel>
+                  <Textarea
+                    defaultValue={props.openPlayer?.profile.aboutMe}
+                    placeholder='aboutMe'
+                    _placeholder={{ color: 'gray.500' }}
+                    onChange={event => setAboutMe(event.target.value)}
+                  />
+                </FormControl>
+                <Stack spacing={6} direction={['column', 'row']}>
+                  <Button
+                    bg={'blue.400'}
+                    color={'white'}
+                    w='full'
+                    _hover={{
+                      bg: 'blue.500',
+                    }}
+                    onClick={() => {
+                      //console.log('click: ', imageList[0]['data_url']);
+                      props.updateData(
+                        imageList.length === 0
+                          ? props.openPlayer?.profile.avatar
+                          : imageList[0]['data_url'],
+                        aboutMe,
+                      );
+                      props.handleClick();
+                    }}>
+                    Submit
+                  </Button>
+                </Stack>
               </Stack>
-            </FormControl>
-            <FormControl id='userName' isRequired>
-              <FormLabel>User name</FormLabel>
-              <Input
-                defaultValue={props.openPlayer?.userName}
-                placeholder='UserName'
-                _placeholder={{ color: 'gray.500' }}
-                type='text'
-              />
-            </FormControl>
-            <FormControl id='aboutMe' isRequired={false}>
-              <FormLabel>About Me</FormLabel>
-              <Textarea
-                defaultValue={props.openPlayer?.profile.aboutMe}
-                placeholder='aboutMe'
-                _placeholder={{ color: 'gray.500' }}
-              />
-            </FormControl>
-            <FormControl id='password' isRequired>
-              <FormLabel>Password</FormLabel>
-              <Input placeholder='password' _placeholder={{ color: 'gray.500' }} type='password' />
-            </FormControl>
-            <Stack spacing={6} direction={['column', 'row']}>
-              <Button
-                bg={'blue.400'}
-                color={'white'}
-                w='full'
-                _hover={{
-                  bg: 'blue.500',
-                }}>
-                Submit
-              </Button>
-            </Stack>
-          </Stack>
+            )}
+          </ImageUploading>
         </Flex>
       </ModalContent>
     </Modal>
   );
 }
+
+// import { Modal, ModalContent, ModalOverlay } from '@chakra-ui/react';
+// import React, { useState } from 'react';
+// import ImageUploading, { ImageListType } from 'react-images-uploading';
+// import PlayerController from '../../../classes/PlayerController';
+
+// interface SelfProfileModalProps {
+//   open: boolean;
+//   openPlayer: PlayerController | undefined;
+//   handleClick: () => void;
+//   updateAboutMe: (newAboutMe: string) => void;
+//   updateAvatar: (newAvatar: string) => void;
+// }
+
+// export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Element {
+//   const handleSubmit = () => {};
+//   const [images, setImages] = useState([]);
+//   const maxNumber = 1;
+//   const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
+//     // data for submit
+//     console.log(imageList, addUpdateIndex);
+//     setImages(imageList as never[]);
+//   };
+
+//   return (
+//     <Modal closeOnOverlayClick={false} isOpen={props.open} onClose={props.handleClick}>
+//       <ModalOverlay />
+//       <ModalContent>
+//         <div className='App'>
+//           <ImageUploading multiple value={images} onChange={onChange} maxNumber={maxNumber}>
+//             {({
+//               imageList,
+//               onImageUpload,
+//               onImageRemoveAll,
+//               onImageUpdate,
+//               onImageRemove,
+//               isDragging,
+//               dragProps,
+//             }) => (
+//               // write your building UI
+//               <div className='upload__image-wrapper'>
+//                 <button
+//                   style={isDragging ? { color: 'red' } : undefined}
+//                   onClick={onImageUpload}
+//                   {...dragProps}>
+//                   Click or Drop here
+//                 </button>
+//                 &nbsp;
+//                 <button onClick={onImageRemoveAll}>Remove all images</button>
+//                 {imageList.map((image, index) => (
+//                   <div key={index} className='image-item'>
+//                     <img src={image.dataURL} alt='' width='100' />
+//                     <div className='image-item__btn-wrapper'>
+//                       <button onClick={() => onImageUpdate(index)}>Update</button>
+//                       <button onClick={() => onImageRemove(index)}>Remove</button>
+//                     </div>
+//                   </div>
+//                 ))}
+//               </div>
+//             )}
+//           </ImageUploading>
+//         </div>
+//       </ModalContent>
+//     </Modal>
+//   );
+// }

@@ -68,6 +68,12 @@ export default class Player {
     return this._sessionToken;
   }
 
+  updateProfile(profile: PlayerProfileModel) {
+    this._playerProfile.avatar = profile.avatar;
+    this._playerProfile.aboutMe = profile.aboutMe;
+    this._playerProfile.friendsList = profile.friendsList;
+  }
+
   toPlayerModel(): PlayerModel {
     return {
       id: this._id,
