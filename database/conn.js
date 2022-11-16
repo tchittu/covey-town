@@ -17,19 +17,7 @@ module.exports = {
       _db = client.db("CoveyTown");
     } catch (err) {
       console.log(err.stack);
-    } finally {
-      //   await client.close();
     }
-
-    // client.connect(function (err, db) {
-    //   // Verify we got a good "db" object
-    //   if (db)
-    //   {
-    //     _db = db.db("CoveyTown");
-    //     console.log("Successfully connected to MongoDB.");
-    //   }
-    //   return callback(err);
-    //      });
   },
 
   getDb: function () {
