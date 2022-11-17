@@ -23,7 +23,7 @@ profileRoutes.route("/profiles").get(function (req, res) {
 // This section will help you get a single profile by username
 profileRoutes.route("/profiles/:username").get(function (req, res) {
   let db_connect = dbo.getDb();
-  let myquery = { _username: req.params.username };
+  let myquery = { username: req.params.username };
   db_connect.collection("profiles").findOne(myquery, function (err, result) {
     if (err) throw err;
     res.json(result);

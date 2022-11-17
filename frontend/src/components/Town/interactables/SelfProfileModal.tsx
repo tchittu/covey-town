@@ -32,8 +32,24 @@ interface SelfProfileModalProps {
 }
 
 export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Element {
+  useEffect(() => {
+    getDBProfile();
+  }, []);
   const [images, setImages] = useState([]);
   const [aboutMe, setAboutMe] = useState('');
+  const getDBProfile = () => {
+    const res = axios
+    .get('http://localhost:4000/profiles/' + props.openPlayer?.userName)
+    .then(res => {
+      props.updateData(
+        res.data.avatar,
+        res.data.aboutMe
+      );
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  }
   const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
     // data for submit
     console.log(imageList, addUpdateIndex);
