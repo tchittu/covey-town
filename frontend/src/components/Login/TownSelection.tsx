@@ -18,13 +18,13 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import assert from 'assert';
+import axios, { AxiosError } from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import TownController from '../../classes/TownController';
 import { Town } from '../../generated/client';
 import useLoginController from '../../hooks/useLoginController';
 import { PlayerProfile } from '../../types/CoveyTownSocket';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
-import axios, { AxiosError } from 'axios';
 
 export default function TownSelection(): JSX.Element {
   const [userName, setUserName] = useState<string>('');
@@ -81,8 +81,8 @@ export default function TownSelection(): JSX.Element {
         }
         const playerProfile: PlayerProfile = {
           avatar: '',
-          aboutMe: 'aboutMe',
-          friendsList: [],
+          aboutMe: '',
+          friendsList: ['starter_friend_1', 'starter_friend_2', 'starter_friend_3'],
         };
         const newController = new TownController({
           userName,

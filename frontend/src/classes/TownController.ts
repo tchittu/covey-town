@@ -434,6 +434,20 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         updatedViewingArea?.updateFrom(interactable);
       }
     });
+
+    this._socket.on('playerUpdated', updatedPlayer => {
+      const playerToUpdate = this.players.find(eachPlayer => eachPlayer.id === updatedPlayer.id);
+      if (playerToUpdate) {
+        playerToUpdate.profile = updatedPlayer.profile;
+      }
+    });
+  }
+
+  public emitPlayerUpdate(newPlayerProfile: PlayerProfile) {
+    this._socket.emit('playerUpdate', newPlayerProfile);
+    const ourPlayer = this._ourPlayer;
+    assert(ourPlayer);
+    ourPlayer.profile = newPlayerProfile;
   }
 
   /**
