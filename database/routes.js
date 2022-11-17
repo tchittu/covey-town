@@ -85,10 +85,8 @@ profileRoutes.route("/profiles/update").post(async function (req, response) {
   let myquery = { username: req.body.username };
   let newvalues = {
     $set: {
-      username: req.body.username,
       avatar: req.body.avatar,
       aboutMe: req.body.aboutMe,
-      friendsList: req.body.friendsList,
     },
   };
   db_connect

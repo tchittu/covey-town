@@ -17,6 +17,7 @@ import {
   useColorModeValue,
   useToast,
 } from '@chakra-ui/react';
+import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
 import PlayerController from '../../../classes/PlayerController';
@@ -146,7 +147,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                     _hover={{
                       bg: 'blue.500',
                     }}
-                    onClick={() => {
+                    onClick={async () => {
                       //console.log('click: ', imageList[0]['data_url']);
                       props.updateData(
                         imageList.length === 0
@@ -154,6 +155,19 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                           : imageList[0]['data_url'],
                         aboutMe,
                       );
+                      const profile = {
+                        username: props.openPlayer?.userName,
+                        avatar: imageList.length === 0 ? props.openPlayer?.profile.avatar : imageList[0]['data_url'],
+                        aboutMe: aboutMe,
+                      };
+                      await axios
+                        .post('http://localhost:4000/profiles/update', profile)
+                        .then(res => {
+                          console.log(res.data);
+                        })
+                        .catch(error => {
+                          console.log(error);
+                        });
                       props.handleClick();
                     }}>
                     Submit
