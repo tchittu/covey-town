@@ -16,12 +16,17 @@ export default function TwoPlayerChat(
 }
 
 export function inboxToText(profile: PlayerProfile | undefined) {
-  let res: string = '';
+  let res = '';
   if (profile && profile.inbox) {
-    profile.inbox.push({author: 'player 1', sid: nanoid(), body: 'hello!', dateCreated: new Date()});
-    profile.inbox.push({author: 'player 2', sid: nanoid(), body: 'goodbye', dateCreated: new Date()});
     profile.inbox.forEach(message => {
-      res = res + message.dateCreated.toDateString() + ', From ' + message.author + ': ' + message.body + '\n\n';
+      res =
+        res +
+        message.dateCreated.toDateString() +
+        ', From ' +
+        message.author +
+        ': ' +
+        message.body +
+        '\n\n';
     });
   }
   return res;
