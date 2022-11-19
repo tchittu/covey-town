@@ -37,14 +37,15 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
   }, []);
   const [images, setImages] = useState([]);
   const [aboutMe, setAboutMe] = useState('');
-  const getDBProfile = () => {
-    const res = axios
+  const getDBProfile = async () => {
+    await axios
     .get('http://localhost:4000/profiles/' + props.openPlayer?.userName)
     .then(res => {
       props.updateData(
         res.data.avatar,
         res.data.aboutMe
       );
+      setAboutMe(res.data.aboutMe);
     })
     .catch(error => {
       console.log(error);
