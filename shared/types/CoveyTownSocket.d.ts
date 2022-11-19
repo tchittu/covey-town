@@ -36,6 +36,7 @@ export interface PlayerProfile {
   avatar: string;
   aboutMe: string;
   friendsList: string[];
+  inbox?: ChatMessage[];
 }
 
 export type XY = { x: number; y: number };

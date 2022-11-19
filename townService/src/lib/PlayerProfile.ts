@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PlayerProfile as PlayerProfileModel } from '../types/CoveyTownSocket';
+import { ChatMessage, PlayerProfile as PlayerProfileModel } from '../types/CoveyTownSocket';
 
 const DEFAULT_AVATAR = 'DefaultAvatar.png';
 
@@ -64,6 +64,17 @@ export default class PlayerProfile {
     this._updateProfileInDB();
   }
 
+  /** A list of the messages received by this player's friends */
+  private _inbox: ChatMessage[] = [];
+
+  public get inbox() {
+    return this._inbox;
+  }
+
+  public set inbox(newList: ChatMessage[]) {
+    this._inbox = newList;
+  }
+
   constructor(userName: string, password: string) {
     this._username = userName;
     this._password = password;
@@ -88,6 +99,11 @@ export default class PlayerProfile {
   public removeFriend(friend: PlayerProfile): void {
     this.friendsList = this.friendsList.filter(name => name !== friend.username);
     this._updateProfileInDB();
+  }
+
+  /** Adds the given message to this player's inbox. */
+  public receiveMessage(message: ChatMessage) {
+    this._inbox.push(message);
   }
 
   /**
@@ -119,6 +135,7 @@ export default class PlayerProfile {
       avatar: this._avatar,
       aboutMe: this._aboutMe,
       friendsList: this._friendsList,
+      inbox: this._inbox,
     };
   }
 }

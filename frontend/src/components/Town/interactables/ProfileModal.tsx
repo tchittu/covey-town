@@ -4,6 +4,8 @@ import {
   Box,
   Button,
   Center,
+  FormControl,
+  FormLabel,
   Heading,
   Modal,
   ModalCloseButton,
@@ -11,6 +13,7 @@ import {
   ModalOverlay,
   Stack,
   Text,
+  Textarea,
   useColorModeValue,
 } from '@chakra-ui/react';
 import React from 'react';

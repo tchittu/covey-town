@@ -15,8 +15,9 @@ import {
   Textarea,
   useColorModeValue,
 } from '@chakra-ui/react';
-import React from 'react';
 import { ProfileModalProps } from './ProfileModalProps';
+import React from 'react';
+import TwoPlayerChat from './TwoPlayerChat';
 
 export default function ProfileModal(props: ProfileModalProps): JSX.Element {
   return (
@@ -79,6 +80,9 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                 Submit
               </Button>
             </Stack>
+            <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
+              Inbox
+            </Heading>
           </Stack>
         </Flex>
       </ModalContent>
