@@ -17,7 +17,7 @@ import {
 } from '@chakra-ui/react';
 import { ProfileModalProps } from './ProfileModalProps';
 import React from 'react';
-import TwoPlayerChat from './TwoPlayerChat';
+import TwoPlayerChat, { inboxToText } from './TwoPlayerChat';
 
 export default function ProfileModal(props: ProfileModalProps): JSX.Element {
   return (
@@ -83,6 +83,9 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
             <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
               Inbox
             </Heading>
+            <div style={{whiteSpace: 'pre-wrap'}}>
+              {inboxToText(props.openPlayer?.profile)}
+            </div>
           </Stack>
         </Flex>
       </ModalContent>
