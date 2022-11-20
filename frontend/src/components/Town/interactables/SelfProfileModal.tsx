@@ -19,6 +19,8 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
+import { ProfileModalProps } from './ProfileModalProps';
+import TwoPlayerChat, { inboxToText } from './TwoPlayerChat';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
 import PlayerController from '../../../classes/PlayerController';
 import useTownController from '../../../hooks/useTownController';
@@ -72,6 +74,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
     coveyTownController.unPause();
     props.handleClick();
   }, [coveyTownController, props.handleClick]);
+
 
   return (
     <Modal
@@ -191,8 +194,46 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                   </Button>
                 </Stack>
               </Stack>
-            )}
+          )}
           </ImageUploading>
+            </FormControl>
+            <FormControl id='userName' isRequired>
+              <FormLabel>User name</FormLabel>
+              <Input
+                defaultValue={props.openPlayer?.userName}
+                placeholder='UserName'
+                _placeholder={{ color: 'gray.500' }}
+                type='text'
+              />
+            </FormControl>
+            <FormControl id='aboutMe' isRequired={false}>
+              <FormLabel>About Me</FormLabel>
+              <Textarea
+                defaultValue={props.openPlayer?.profile.aboutMe}
+                placeholder='aboutMe'
+                _placeholder={{ color: 'gray.500' }}
+              />
+            </FormControl>
+            <FormControl id='password' isRequired>
+              <FormLabel>Password</FormLabel>
+              <Input placeholder='password' _placeholder={{ color: 'gray.500' }} type='password' />
+            </FormControl>
+            <Stack spacing={6} direction={['column', 'row']}>
+              <Button
+                bg={'blue.400'}
+                color={'white'}
+                w='full'
+                _hover={{
+                  bg: 'blue.500',
+                }}>
+                Submit
+              </Button>
+            </Stack>
+            <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
+              Inbox
+            </Heading>
+            <div style={{ whiteSpace: 'pre-wrap' }}>{inboxToText(props.openPlayer?.profile)}</div>
+          </Stack>
         </Flex>
       </ModalContent>
     </Modal>

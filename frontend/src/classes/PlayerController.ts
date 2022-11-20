@@ -1,6 +1,11 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
-import { Player as PlayerModel, PlayerLocation, PlayerProfile } from '../types/CoveyTownSocket';
+import {
+  ChatMessage,
+  Player as PlayerModel,
+  PlayerLocation,
+  PlayerProfile,
+} from '../types/CoveyTownSocket';
 
 export type PlayerEvents = {
   movement: (newLocation: PlayerLocation) => void;
@@ -26,7 +31,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     id: string,
     userName: string,
     location: PlayerLocation,
-    profile: PlayerProfile = { avatar: 'default', aboutMe: 'default', friendsList: [] },
+    profile: PlayerProfile = { avatar: 'default', aboutMe: 'default', friendsList: [], inbox: [] },
   ) {
     super();
     this._id = id;
@@ -89,5 +94,12 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       modelPlayer.location,
       modelPlayer.profile,
     );
+  }
+
+  public receiveMessage(message: ChatMessage): void {
+    const newInbox: ChatMessage[] | undefined = this.profile.inbox?.concat([message]);
+    if (newInbox) {
+      this.profile.inbox = newInbox;
+    }
   }
 }
