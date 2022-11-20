@@ -44,6 +44,7 @@ export default class Player {
     const playerProfile = new PlayerProfile('temp_username', 'temp_pass');
     playerProfile.avatar = playerProfileModel.avatar;
     playerProfile.aboutMe = playerProfileModel.aboutMe;
+    playerProfile.friendsList = playerProfileModel.friendsList;
     this._playerProfile = playerProfile;
     this.townEmitter = townEmitter;
   }
@@ -66,6 +67,12 @@ export default class Player {
 
   get sessionToken(): string {
     return this._sessionToken;
+  }
+
+  updateProfile(profile: PlayerProfileModel) {
+    this._playerProfile.avatar = profile.avatar;
+    this._playerProfile.aboutMe = profile.aboutMe;
+    this._playerProfile.friendsList = profile.friendsList;
   }
 
   toPlayerModel(): PlayerModel {

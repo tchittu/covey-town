@@ -14,6 +14,13 @@ export default function TownMap(): JSX.Element {
   const [openPlayer, setOpenPlayer] = React.useState<PlayerController>();
   const [isSelf, setIsSelf] = React.useState(false);
   const handleClose = () => setOpenProfile(false);
+  const updateData = (newAvatar: string | undefined, newAboutMe: string) => {
+    coveyTownController.emitPlayerUpdate({
+      avatar: newAvatar == undefined ? '' : newAvatar,
+      aboutMe: newAboutMe,
+      friendsList: [],
+    });
+  };
 
   useEffect(() => {
     const config = {
@@ -60,7 +67,12 @@ export default function TownMap(): JSX.Element {
   return isSelf ? (
     <div id='app-container'>
       <NewConversationModal />
-      <SelfProfileModal open={openProfile} openPlayer={openPlayer} handleClick={handleClose} />
+      <SelfProfileModal
+        open={openProfile}
+        openPlayer={openPlayer}
+        handleClick={handleClose}
+        updateData={updateData}
+      />
       <div id='map-container' />
       <SocialSidebar />
     </div>

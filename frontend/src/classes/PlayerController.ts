@@ -62,6 +62,10 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     return this._profile;
   }
 
+  set profile(profile: PlayerProfile) {
+    this._profile = profile;
+  }
+
   toPlayerModel(): PlayerModel {
     return { id: this.id, userName: this.userName, location: this.location, profile: this.profile };
   }

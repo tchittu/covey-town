@@ -161,7 +161,16 @@ export default class Town {
         }
       }
     });
+
+    socket.on('playerUpdate', (newPlayerProfile: PlayerProfile) => {
+      this._updatePlayer(newPlayer, newPlayerProfile);
+    });
     return newPlayer;
+  }
+
+  private _updatePlayer(player: Player, playerProfile: PlayerProfile): void {
+    player.updateProfile(playerProfile);
+    this._broadcastEmitter.emit('playerUpdated', player.toPlayerModel());
   }
 
   /**
