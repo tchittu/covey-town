@@ -7,6 +7,7 @@ import {
   FormControl,
   FormLabel,
   Heading,
+  Input,
   Modal,
   ModalCloseButton,
   ModalContent,
@@ -19,11 +20,12 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ProfileModalProps } from './ProfileModalProps';
+import { ProfileModalProps } from './ProfileModal';
 import TwoPlayerChat, { inboxToText } from './TwoPlayerChat';
-import ImageUploading, { ImageListType } from 'react-images-uploading';
+import ImageUploading, { ImageListType, ImageType } from 'react-images-uploading';
 import PlayerController from '../../../classes/PlayerController';
 import useTownController from '../../../hooks/useTownController';
+import { ExportInterface } from 'react-images-uploading/dist/typings';
 
 const MAX_IMAGE_SIZE = 209715;
 interface SelfProfileModalProps {
@@ -75,7 +77,6 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
     props.handleClick();
   }, [coveyTownController, props.handleClick]);
 
-
   return (
     <Modal
       closeOnOverlayClick={false}
@@ -84,16 +85,16 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
         closeModal();
         coveyTownController.unPause();
       }}>
-      <ModalOverlay />
+      <ModalOverlay/>
       <ModalContent>
         <ModalCloseButton autoFocus={false} />
         <Flex align={'center'} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
-          <ImageUploading
+          {/* <ImageUploading
             value={images}
             onChange={onChange}
             dataURLKey='data_url'
             maxFileSize={MAX_IMAGE_SIZE}
-            onError={(errors, files) => {
+            onError={(errors: any, files: any) => {
               console.log('Error: ', errors);
               toast({
                 title: 'Error uploading image',
@@ -113,8 +114,9 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                 isClosable: true,
                 duration: 4000,
               });
-            }}>
-            {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove }) => (
+            }}
+            >
+             {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove }: ExportInterface) => (
               <Stack
                 spacing={4}
                 w={'full'}
@@ -194,46 +196,124 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                   </Button>
                 </Stack>
               </Stack>
+
           )}
-          </ImageUploading>
-            </FormControl>
-            <FormControl id='userName' isRequired>
-              <FormLabel>User name</FormLabel>
-              <Input
-                defaultValue={props.openPlayer?.userName}
-                placeholder='UserName'
-                _placeholder={{ color: 'gray.500' }}
-                type='text'
-              />
-            </FormControl>
-            <FormControl id='aboutMe' isRequired={false}>
-              <FormLabel>About Me</FormLabel>
-              <Textarea
-                defaultValue={props.openPlayer?.profile.aboutMe}
-                placeholder='aboutMe'
-                _placeholder={{ color: 'gray.500' }}
-              />
-            </FormControl>
-            <FormControl id='password' isRequired>
-              <FormLabel>Password</FormLabel>
-              <Input placeholder='password' _placeholder={{ color: 'gray.500' }} type='password' />
-            </FormControl>
-            <Stack spacing={6} direction={['column', 'row']}>
-              <Button
-                bg={'blue.400'}
-                color={'white'}
-                w='full'
-                _hover={{
-                  bg: 'blue.500',
-                }}>
-                Submit
-              </Button>
-            </Stack>
+          </ImageUploading> */}
+
+        <ImageUploading 
+            value={images}
+            onChange={onChange}
+            dataURLKey='data_url'
+            maxFileSize={MAX_IMAGE_SIZE}
+            onError={(errors: any, files: any) => {
+              console.log('Error: ', errors);
+              toast({
+                title: 'Error uploading image',
+                description: errors && (
+                  <div>
+                    {errors.maxNumber && <span>Number of selected images exceed maxNumber</span>}
+                    {errors.acceptType && <span>Your selected file type is not allow</span>}
+                    {errors.maxFileSize && (
+                      <span>Selected file size exceed maxFileSize: {MAX_IMAGE_SIZE} bytes</span>
+                    )}
+                    {errors.resolution && (
+                      <span>Selected file is not match your desired resolution</span>
+                    )}
+                  </div>
+                ),
+                status: 'error',
+                isClosable: true,
+                duration: 4000,
+              });
+            }}>
+        {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove }) => (
+          <Stack
+                spacing={4}
+                w={'full'}
+                maxW={'md'}
+                bg={useColorModeValue('white', 'gray.700')}
+                rounded={'xl'}
+                boxShadow={'lg'}
+                p={6}>
+                <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
+                  User Profile Edit
+                </Heading>
+                <FormControl id='userName'>
+                  <FormLabel>User Avatar</FormLabel>
+                  <Stack direction={['column', 'row']} spacing={6}>
+                    <Center>
+                      <div className='image-item'>
+                        <Avatar
+                          size='xl'
+                          src={
+                            imageList.length === 0
+                              ? props.openPlayer?.profile.avatar
+                              : imageList[0]['data_url']
+                          }></Avatar>
+                      </div>
+                    </Center>
+                    <Center w='full'>
+                      <Button w='full' 
+                      onClick={onImageUpload}
+                      >
+                        Change Avatar
+                      </Button>
+                    </Center>
+                  </Stack>
+                </FormControl>
+                <Text fontSize='xl' as='b'>
+                  {props.openPlayer?.userName}
+                </Text>
+                <FormControl id='aboutMe' isRequired={false}>
+                  <FormLabel>About Me</FormLabel>
+                  <Textarea
+                    defaultValue={props.openPlayer?.profile.aboutMe}
+                    placeholder='aboutMe'
+                    _placeholder={{ color: 'gray.500' }}
+                    onChange={event => setAboutMe(event.target.value)}
+                  />
+                </FormControl>
+                <Stack spacing={6} direction={['column', 'row']}>
+                  <Button
+                    bg={'blue.400'}
+                    color={'white'}
+                    w='full'
+                    _hover={{
+                      bg: 'blue.500',
+                    }}
+                    onClick={async () => {
+                      console.log('click: ', imageList[0]['data_url']);
+                      props.updateData(
+                        imageList.length === 0
+                          ? props.openPlayer?.profile.avatar
+                          : imageList[0]['data_url'],
+                        aboutMe,
+                      );
+                      const profile = {
+                        username: props.openPlayer?.userName,
+                        avatar: imageList.length === 0 ? props.openPlayer?.profile.avatar : imageList[0]['data_url'],
+                        aboutMe: aboutMe,
+                      };
+                      await axios
+                        .post('http://localhost:4000/profiles/update', profile)
+                        .then(res => {
+                          console.log(res.data);
+                        })
+                        .catch(error => {
+                          console.log(error);
+                        });
+                      props.handleClick();
+                    }}>
+                    Submit
+                  </Button>
+                </Stack>
             <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
               Inbox
             </Heading>
             <div style={{ whiteSpace: 'pre-wrap' }}>{inboxToText(props.openPlayer?.profile)}</div>
-          </Stack>
+            </Stack>
+           )}
+            </ImageUploading> 
         </Flex>
       </ModalContent>
     </Modal>

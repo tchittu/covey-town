@@ -31,7 +31,7 @@ import React, { useCallback, useEffect } from 'react';
 import PlayerController from '../../../classes/PlayerController';
 import useTownController from '../../../hooks/useTownController';
 
-interface ProfileModalProps {
+export interface ProfileModalProps {
   open: boolean;
   openPlayer: PlayerController | undefined;
   handleClick: () => void;
