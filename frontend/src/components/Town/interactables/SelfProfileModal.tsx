@@ -28,7 +28,7 @@ interface SelfProfileModalProps {
   open: boolean;
   openPlayer: PlayerController | undefined;
   handleClick: () => void;
-  updateData: (avatar: string | undefined, aboutMe: string) => void;
+  updateData: (avatar: string | undefined, aboutMe: string, friendsList: string[] | undefined) => void;
 }
 
 export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Element {
@@ -43,7 +43,8 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
     .then(res => {
       props.updateData(
         res.data.avatar,
-        res.data.aboutMe
+        res.data.aboutMe,
+        res.data.friendsList,
       );
       setAboutMe(res.data.aboutMe);
     })
@@ -171,6 +172,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                           ? props.openPlayer?.profile.avatar
                           : imageList[0]['data_url'],
                         aboutMe,
+                        props.openPlayer?.profile.friendsList,
                       );
                       const profile = {
                         username: props.openPlayer?.userName,
