@@ -22,6 +22,7 @@ import {
   Text,
   useColorModeValue,
   useDisclosure,
+  useToast,
   VStack,
 } from '@chakra-ui/react';
 import axios from 'axios';
@@ -43,22 +44,23 @@ interface ProfileModalProps {
 export default function ProfileModal(props: ProfileModalProps): JSX.Element {
   const coveyTownController = useTownController();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // const getDBProfile = async () => {
-  //   await axios
-  //     .get('http://localhost:4000/profiles/' + props.openPlayer?.userName)
-  //     .then(res => {
-  //       console.log(res);
-  //       props.updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
-  //       console.log(friendsList);
-  //     })
-  //     .catch(error => {
-  //       console.log(error);
-  //     });
-  // };
+  const getDBProfile = async () => {
+    await axios
+      .get('http://localhost:4000/profiles/' + props.openPlayer?.userName)
+      .then(res => {
+        console.log(res);
+        props.updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
 
-  // useEffect(() => {
-  //   getDBProfile();
-  // }, []);
+  const toast = useToast();
+
+  useEffect(() => {
+    getDBProfile();
+  }, []);
 
   useEffect(() => {
     if (props.open) {
@@ -184,29 +186,42 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                   bg: 'blue.500',
                 }}
                 onClick={async () => {
-                  props.openPlayer?.profile.friendsList.push(
-                    coveyTownController.ourPlayer.userName,
-                  );
-                  props.updateData(
-                    props.openPlayer?.profile.avatar,
-                    props.openPlayer?.profile.aboutMe === undefined
-                      ? ''
-                      : props.openPlayer?.profile.aboutMe,
-                    props.openPlayer?.profile.friendsList,
-                  );
-                  const profile = {
-                    username: props.openPlayer?.userName,
-                    friendsList: props.openPlayer?.profile.friendsList,
-                  };
-                  await axios
-                    .post('http://localhost:4000/profiles/addFriend', profile)
-                    .then(res => {
-                      console.log(res.data);
-                    })
-                    .catch(error => {
-                      console.log(error);
+                  if (
+                    !props.openPlayer?.profile.friendsList.includes(
+                      coveyTownController.ourPlayer.userName,
+                    )
+                  ) {
+                    props.openPlayer?.profile.friendsList.push(
+                      coveyTownController.ourPlayer.userName,
+                    );
+                    props.updateData(
+                      props.openPlayer?.profile.avatar,
+                      props.openPlayer?.profile.aboutMe === undefined
+                        ? ''
+                        : props.openPlayer?.profile.aboutMe,
+                      props.openPlayer?.profile.friendsList,
+                    );
+                    const profile = {
+                      username: props.openPlayer?.userName,
+                      friendsList: props.openPlayer?.profile.friendsList,
+                    };
+                    await axios
+                      .post('http://localhost:4000/profiles/addFriend', profile)
+                      .then(res => {
+                        console.log(res.data);
+                      })
+                      .catch(error => {
+                        console.log(error);
+                      });
+                    props.handleClick();
+                  } else {
+                    toast({
+                      title: 'Unable to add friend',
+                      description: 'this player is already in your friendslist',
+                      status: 'error',
                     });
-                  props.handleClick();
+                    return;
+                  }
                 }}>
                 Add Friend
               </Button>
