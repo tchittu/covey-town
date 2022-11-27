@@ -178,6 +178,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                         username: props.openPlayer?.userName,
                         avatar: imageList.length === 0 ? props.openPlayer?.profile.avatar : imageList[0]['data_url'],
                         aboutMe: aboutMe,
+                        friendsList: props.openPlayer?.profile.friendsList,
                       };
                       await axios
                         .post('http://localhost:4000/profiles/update', profile)

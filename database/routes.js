@@ -87,6 +87,7 @@ profileRoutes.route("/profiles/update").post(async function (req, response) {
     $set: {
       avatar: req.body.avatar,
       aboutMe: req.body.aboutMe,
+      friendsList: req.body.friendsList,
     },
   };
   db_connect

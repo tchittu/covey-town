@@ -123,6 +123,15 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                   <DrawerBody>
                     <VStack w={400} spacing={4} align='start'>
                       {props.openPlayer?.profile.friendsList.map(friend => {
+                        let isHidden = false;
+                        if (friend.username === coveyTownController.ourPlayer.userName) {
+                          isHidden = true;
+                        }
+                        coveyTownController.ourPlayer.profile.friendsList.map(ourFriend => {
+                          if (ourFriend.username === friend.username) {
+                            isHidden = true;
+                          }
+                        });
                         return (
                           <HStack key={friend.username} spacing={3}>
                             <Avatar src={friend.avatar} />
@@ -131,9 +140,29 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                             </Heading>
                             <ButtonGroup>
                               <IconButton
+                                hidden={isHidden}
                                 aria-label='Add to friends'
                                 size='xs'
                                 icon={<AddIcon />}
+                                onClick={async () => {
+                                  coveyTownController.ourPlayer.profile.friendsList.push(friend);
+                                  const profile = {
+                                    username: coveyTownController.ourPlayer.userName,
+                                    avatar: coveyTownController.ourPlayer.profile.avatar,
+                                    aboutMe: coveyTownController.ourPlayer.profile.aboutMe,
+                                    friendsList: coveyTownController.ourPlayer.profile.friendsList,
+                                  };
+                                  await axios
+                                    .post('http://localhost:4000/profiles/update', profile)
+                                    .then(res => {
+                                      console.log(profile);
+                                      console.log(res.data);
+                                    })
+                                    .catch(error => {
+                                      console.log(error);
+                                    });
+                                  props.handleClick();
+                                }}
                               />
                             </ButtonGroup>
                           </HStack>
