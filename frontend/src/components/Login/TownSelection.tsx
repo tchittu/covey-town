@@ -82,7 +82,12 @@ export default function TownSelection(): JSX.Element {
         const playerProfile: PlayerProfile = {
           avatar: '',
           aboutMe: '',
-          friendsList: ['starter_friend_1', 'starter_friend_2', 'starter_friend_3'],
+          friendsList: [
+            'starter_friend_1',
+            'starter_friend_2',
+            'starter_friend_3',
+            'starter_friend_4',
+          ],
         };
         const newController = new TownController({
           userName,
@@ -244,7 +249,6 @@ export default function TownSelection(): JSX.Element {
             <FormControl>
               <FormLabel htmlFor='name'>Password</FormLabel>
               <Input
-                autoFocus
                 name='password'
                 placeholder='Your password'
                 value={password}

@@ -14,14 +14,13 @@ export default function TownMap(): JSX.Element {
   const [openPlayer, setOpenPlayer] = React.useState<PlayerController>();
   const [isSelf, setIsSelf] = React.useState(false);
   const handleClose = () => setOpenProfile(false);
-  const updateData = (newAvatar: string | undefined, newAboutMe: string) => {
+  const updateData = (newAvatar: string | undefined, newAboutMe: string, friendsList: string[]) => {
     coveyTownController.emitPlayerUpdate({
       avatar: newAvatar == undefined ? '' : newAvatar,
       aboutMe: newAboutMe,
-      friendsList: [],
+      friendsList: friendsList,
     });
   };
-
   useEffect(() => {
     const config = {
       type: Phaser.AUTO,
@@ -79,7 +78,13 @@ export default function TownMap(): JSX.Element {
   ) : (
     <div id='app-container'>
       <NewConversationModal />
-      <ProfileModal open={openProfile} openPlayer={openPlayer} handleClick={handleClose} />
+      <ProfileModal
+        open={openProfile}
+        openPlayer={openPlayer}
+        handleClick={handleClose}
+        updateData={updateData}
+        self={coveyTownController.ourPlayer}
+      />
       <div id='map-container' />
       <SocialSidebar />
     </div>

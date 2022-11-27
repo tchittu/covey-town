@@ -24,7 +24,7 @@ import {
   useDisclosure,
   VStack,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PlayerController from '../../../classes/PlayerController';
 import useTownController from '../../../hooks/useTownController';
 
@@ -32,11 +32,14 @@ interface ProfileModalProps {
   open: boolean;
   openPlayer: PlayerController | undefined;
   handleClick: () => void;
+  updateData: (avatar: string | undefined, aboutMe: string, friendsList: string[]) => void;
+  self: PlayerController;
 }
 
 export default function ProfileModal(props: ProfileModalProps): JSX.Element {
   const coveyTownController = useTownController();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isFriend, setIsFriend] = useState<boolean>(false);
 
   useEffect(() => {
     if (props.open) {
@@ -44,12 +47,22 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
     } else {
       coveyTownController.unPause();
     }
+    setIsFriend(props.self.profile.friendsList.some(x => x === props.openPlayer?.userName));
   }, [coveyTownController, props.open]);
 
   const closeModal = useCallback(() => {
     coveyTownController.unPause();
     props.handleClick();
   }, [coveyTownController, props.handleClick]);
+  console.log(
+    'self: ',
+    props.self.userName,
+    ' selfFriends: ',
+    props.self.profile.friendsList,
+    ' openPlayer: ',
+    props.openPlayer?.userName,
+    isFriend,
+  );
   return (
     <Modal
       closeOnOverlayClick={false}
@@ -160,8 +173,29 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                 }}
                 _focus={{
                   bg: 'blue.500',
+                }}
+                onClick={() => {
+                  if (isFriend) {
+                    props.updateData(
+                      props.self.profile.avatar,
+                      props.self.profile.aboutMe,
+                      props.self.profile.friendsList.filter(x => x !== props.openPlayer!.userName),
+                    );
+                    setIsFriend(false);
+                  } else {
+                    const newFriendsList = props.self.profile.friendsList;
+                    if (newFriendsList.findIndex(x => x === props.openPlayer!.userName) == -1) {
+                      newFriendsList.push(props.openPlayer!.userName);
+                    }
+                    props.updateData(
+                      props.self.profile.avatar,
+                      props.self.profile.aboutMe,
+                      newFriendsList,
+                    );
+                    setIsFriend(true);
+                  }
                 }}>
-                Add Friend
+                {isFriend ? 'Remove Friend' : 'Add Friend'}
               </Button>
             </Stack>
           </Box>
