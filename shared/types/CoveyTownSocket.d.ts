@@ -87,6 +87,7 @@ export interface ServerToClientEvents {
   chatMessage: (message: ChatMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
   playerUpdated: (updatedPlayer: Player) => void;
+  directMessage: (message: ChatMessage, toPlayer: string) => void;
 }
 
 export interface ClientToServerEvents {
@@ -94,4 +95,5 @@ export interface ClientToServerEvents {
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
   playerUpdate: (newPlayerProfile: PlayerProfile) => void;
+  directMessage: (message: ChatMessage, toPlayer: string) => void;
 }

@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import PlayerController from '../../../classes/PlayerController';
-import { PlayerProfile } from '../../../types/CoveyTownSocket';
+import { ChatMessage, PlayerProfile } from '../../../types/CoveyTownSocket';
 
 export default function TwoPlayerChat(
   sender: PlayerController,
@@ -15,19 +15,13 @@ export default function TwoPlayerChat(
   });
 }
 
-export function inboxToText(profile: PlayerProfile | undefined) {
+export function inboxToText(inbox: ChatMessage[] | undefined): string {
   let res = '';
-  if (profile && profile.inbox) {
-    profile.inbox.forEach(message => {
-      res =
-        res +
-        message.dateCreated.toDateString() +
-        ', From ' +
-        message.author +
-        ': ' +
-        message.body +
-        '\n\n';
-    });
+  if (!inbox) {
+    return res;
   }
+  inbox.forEach(message => {
+    res = res + 'From ' + message.author + ': ' + message.body + '\n\n';
+  });
   return res;
 }

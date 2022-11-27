@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { ChatMessage, PlayerProfile as PlayerProfileModel } from '../types/CoveyTownSocket';
 
-
 const DEFAULT_AVATAR = 'DefaultAvatar.png';
 
 export default class PlayerProfile {
@@ -126,7 +125,6 @@ export default class PlayerProfile {
    */
   private async _updateProfileInDB(): Promise<void> {
     await axios.put('http://localhost:4000/profiles/update:username', this._toJSONObj());
-
   }
 
   public toProfileModel(): PlayerProfileModel {
