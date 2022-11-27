@@ -2,6 +2,11 @@ import { PlayerProfile as PlayerProfileModel } from '../types/CoveyTownSocket';
 
 const DEFAULT_AVATAR = 'DefaultAvatar.png';
 
+export interface Friend {
+  username: string;
+  avatar: string;
+}
+
 export default class PlayerProfile {
   /** The username of the player which matches the username field of the corresponding Player object */
   private _username: string;
@@ -50,13 +55,13 @@ export default class PlayerProfile {
   }
 
   /** A list of usernames of players that are friends with this player */
-  private _friendsList: string[] = [];
+  private _friendsList: Friend[] = [];
 
   public get friendsList() {
     return this._friendsList;
   }
 
-  public set friendsList(newList: string[]) {
+  public set friendsList(newList: Friend[]) {
     this._friendsList = newList;
   }
 
@@ -70,10 +75,14 @@ export default class PlayerProfile {
    * if the given player profile is this player, nothing happens.
    */
   public addFriend(friend: PlayerProfile): void {
-    const alreadyFriend = this.friendsList.find(name => name === friend.username);
+    const alreadyFriend = this.friendsList.find(name => name.username === friend.username);
     const isThisPlayer = this.username === friend.username;
     if (!alreadyFriend && !isThisPlayer) {
-      this._friendsList.push(friend.username);
+      const friendListObj = {
+        username: friend.username,
+        avatar: friend.avatar,
+      };
+      this._friendsList.push(friendListObj);
     }
   }
 
@@ -81,7 +90,7 @@ export default class PlayerProfile {
    * is not in the friend list, nothing happens.
    */
   public removeFriend(friend: PlayerProfile): void {
-    this.friendsList = this.friendsList.filter(name => name !== friend.username);
+    this.friendsList = this.friendsList.filter(name => name.username !== friend.username);
   }
 
   public toProfileModel(): PlayerProfileModel {

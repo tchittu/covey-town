@@ -44,23 +44,8 @@ interface ProfileModalProps {
 export default function ProfileModal(props: ProfileModalProps): JSX.Element {
   const coveyTownController = useTownController();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const getDBProfile = async () => {
-    await axios
-      .get('http://localhost:4000/profiles/' + props.openPlayer?.userName)
-      .then(res => {
-        console.log(res);
-        props.updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
 
   const toast = useToast();
-
-  useEffect(() => {
-    getDBProfile();
-  }, []);
 
   useEffect(() => {
     if (props.open) {
@@ -139,10 +124,10 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                     <VStack w={400} spacing={4} align='start'>
                       {props.openPlayer?.profile.friendsList.map(friend => {
                         return (
-                          <HStack key={friend} spacing={3}>
-                            <Avatar />
+                          <HStack key={friend.username} spacing={3}>
+                            <Avatar src={friend.avatar} />
                             <Heading fontSize={18} color='teal.900'>
-                              {friend}
+                              {friend.username}
                             </Heading>
                             <ButtonGroup>
                               <IconButton
@@ -186,14 +171,18 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                   bg: 'blue.500',
                 }}
                 onClick={async () => {
-                  if (
-                    !props.openPlayer?.profile.friendsList.includes(
-                      coveyTownController.ourPlayer.userName,
-                    )
-                  ) {
-                    props.openPlayer?.profile.friendsList.push(
-                      coveyTownController.ourPlayer.userName,
-                    );
+                  let notRepeat = true;
+                  props.openPlayer?.profile.friendsList.map(friend => {
+                    if (friend.username === coveyTownController.ourPlayer.userName) {
+                      notRepeat = false;
+                    }
+                  });
+                  if (notRepeat) {
+                    const friendObj = {
+                      username: coveyTownController.ourPlayer.userName,
+                      avatar: coveyTownController.ourPlayer.profile.avatar,
+                    };
+                    props.openPlayer?.profile.friendsList.push(friendObj);
                     props.updateData(
                       props.openPlayer?.profile.avatar,
                       props.openPlayer?.profile.aboutMe === undefined
