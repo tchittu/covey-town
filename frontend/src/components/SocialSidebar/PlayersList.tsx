@@ -13,7 +13,6 @@ import PlayerName from './PlayerName';
 export default function PlayersInTownList(): JSX.Element {
   const players = usePlayers();
   const { friendlyName, townID } = useTownController();
-  console.log('rendered');
   const sorted = players.concat([]);
   sorted.sort((p1, p2) =>
     p1.userName.localeCompare(p2.userName, undefined, { numeric: true, sensitivity: 'base' }),

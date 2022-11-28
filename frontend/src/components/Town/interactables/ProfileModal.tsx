@@ -22,11 +22,10 @@ import {
   Text,
   useColorModeValue,
   useDisclosure,
-  useToast,
   VStack,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PlayerController from '../../../classes/PlayerController';
 import useTownController from '../../../hooks/useTownController';
 
@@ -34,18 +33,14 @@ interface ProfileModalProps {
   open: boolean;
   openPlayer: PlayerController | undefined;
   handleClick: () => void;
-  updateData: (
-    avatar: string | undefined,
-    aboutMe: string,
-    friendsList: string[] | undefined,
-  ) => void;
+  updateData: (avatar: string | undefined, aboutMe: string, friendsList: string[]) => void;
+  self: PlayerController;
 }
 
 export default function ProfileModal(props: ProfileModalProps): JSX.Element {
   const coveyTownController = useTownController();
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const toast = useToast();
+  const [isFriend, setIsFriend] = useState<boolean>(false);
 
   useEffect(() => {
     if (props.open) {
@@ -53,12 +48,22 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
     } else {
       coveyTownController.unPause();
     }
+    setIsFriend(props.self.profile.friendsList.some(x => x === props.openPlayer?.userName));
   }, [coveyTownController, props.open]);
 
   const closeModal = useCallback(() => {
     coveyTownController.unPause();
     props.handleClick();
   }, [coveyTownController, props.handleClick]);
+  console.log(
+    'self: ',
+    props.self.userName,
+    ' selfFriends: ',
+    props.self.profile.friendsList,
+    ' openPlayer: ',
+    props.openPlayer?.userName,
+    isFriend,
+  );
   return (
     <Modal
       closeOnOverlayClick={false}
@@ -124,19 +129,19 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                     <VStack w={400} spacing={4} align='start'>
                       {props.openPlayer?.profile.friendsList.map(friend => {
                         let isHidden = false;
-                        if (friend.username === coveyTownController.ourPlayer.userName) {
+                        if (friend === coveyTownController.ourPlayer.userName) {
                           isHidden = true;
                         }
                         coveyTownController.ourPlayer.profile.friendsList.map(ourFriend => {
-                          if (ourFriend.username === friend.username) {
+                          if (ourFriend === friend) {
                             isHidden = true;
                           }
                         });
                         return (
-                          <HStack key={friend.username} spacing={3}>
-                            <Avatar src={friend.avatar} />
+                          <HStack key={friend} spacing={3}>
+                            {/* <Avatar src={friend.avatar} /> */}
                             <Heading fontSize={18} color='teal.900'>
-                              {friend.username}
+                              {friend}
                             </Heading>
                             <ButtonGroup>
                               <IconButton
@@ -146,6 +151,11 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                                 icon={<AddIcon />}
                                 onClick={async () => {
                                   coveyTownController.ourPlayer.profile.friendsList.push(friend);
+                                  props.updateData(
+                                    coveyTownController.ourPlayer.profile.avatar,
+                                    coveyTownController.ourPlayer.profile.aboutMe,
+                                    coveyTownController.ourPlayer.profile.friendsList,
+                                  );
                                   const profile = {
                                     username: coveyTownController.ourPlayer.userName,
                                     avatar: coveyTownController.ourPlayer.profile.avatar,
@@ -200,28 +210,17 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                   bg: 'blue.500',
                 }}
                 onClick={async () => {
-                  let notRepeat = true;
-                  props.openPlayer?.profile.friendsList.map(friend => {
-                    if (friend.username === coveyTownController.ourPlayer.userName) {
-                      notRepeat = false;
-                    }
-                  });
-                  if (notRepeat) {
-                    const friendObj = {
-                      username: coveyTownController.ourPlayer.userName,
-                      avatar: coveyTownController.ourPlayer.profile.avatar,
-                    };
-                    props.openPlayer?.profile.friendsList.push(friendObj);
+                  if (isFriend) {
                     props.updateData(
-                      props.openPlayer?.profile.avatar,
-                      props.openPlayer?.profile.aboutMe === undefined
-                        ? ''
-                        : props.openPlayer?.profile.aboutMe,
-                      props.openPlayer?.profile.friendsList,
+                      props.self.profile.avatar,
+                      props.self.profile.aboutMe,
+                      props.self.profile.friendsList.filter(x => x !== props.openPlayer!.userName),
                     );
                     const profile = {
-                      username: props.openPlayer?.userName,
-                      friendsList: props.openPlayer?.profile.friendsList,
+                      username: props.self.userName,
+                      friendsList: props.self.profile.friendsList.filter(
+                        x => x !== props.openPlayer!.userName,
+                      ),
                     };
                     await axios
                       .post('http://localhost:4000/profiles/addFriend', profile)
@@ -231,17 +230,35 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                       .catch(error => {
                         console.log(error);
                       });
+                    setIsFriend(false);
                     props.handleClick();
                   } else {
-                    toast({
-                      title: 'Unable to add friend',
-                      description: 'this player is already in your friendslist',
-                      status: 'error',
-                    });
-                    return;
+                    const newFriendsList = props.self.profile.friendsList;
+                    if (newFriendsList.findIndex(x => x === props.openPlayer!.userName) == -1) {
+                      newFriendsList.push(props.openPlayer!.userName);
+                    }
+                    props.updateData(
+                      props.self.profile.avatar,
+                      props.self.profile.aboutMe,
+                      newFriendsList,
+                    );
+                    const profile = {
+                      username: props.self.userName,
+                      friendsList: newFriendsList,
+                    };
+                    await axios
+                      .post('http://localhost:4000/profiles/addFriend', profile)
+                      .then(res => {
+                        console.log(res.data);
+                      })
+                      .catch(error => {
+                        console.log(error);
+                      });
+                    setIsFriend(true);
+                    props.handleClick();
                   }
                 }}>
-                Add Friend
+                {isFriend ? 'Remove Friend' : 'Add Friend'}
               </Button>
             </Stack>
           </Box>

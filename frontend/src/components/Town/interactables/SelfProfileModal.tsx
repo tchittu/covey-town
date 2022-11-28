@@ -1,8 +1,16 @@
 /* eslint-disable */
 import {
   Avatar,
+  Box,
   Button,
   Center,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   Flex,
   FormControl,
   FormLabel,
@@ -15,28 +23,35 @@ import {
   Text,
   Textarea,
   useColorModeValue,
+  useDisclosure,
   useToast,
+  VStack,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
 import PlayerController from '../../../classes/PlayerController';
 import useTownController from '../../../hooks/useTownController';
+import { SelfFriendItem } from './SelfFriendItem';
 
 const MAX_IMAGE_SIZE = 209715;
 interface SelfProfileModalProps {
   open: boolean;
   openPlayer: PlayerController | undefined;
   handleClick: () => void;
-  updateData: (avatar: string | undefined, aboutMe: string, friendsList: string[] | undefined) => void;
+  updateData: (avatar: string | undefined, aboutMe: string, friendsList: string[]) => void;
 }
 
 export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Element {
+  if (props.openPlayer == undefined) {
+    throw new Error('Error in clicking logic!');
+  }
   useEffect(() => {
     getDBProfile();
   }, []);
   const [images, setImages] = useState([]);
   const [aboutMe, setAboutMe] = useState('');
+  const [friendsList, setFriendsList] = useState(props.openPlayer.profile.friendsList);
   const getDBProfile = async () => {
     await axios
     .get('http://localhost:4000/profiles/' + props.openPlayer?.userName)
@@ -47,6 +62,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
         res.data.friendsList,
       );
       setAboutMe(res.data.aboutMe);
+      setFriendsList(res.data.friendsList);
     })
     .catch(error => {
       console.log(error);
@@ -57,6 +73,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
     console.log(imageList, addUpdateIndex);
     setImages(imageList as never[]);
   };
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const toast = useToast();
   const coveyTownController = useTownController();
@@ -157,6 +174,57 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                     onChange={event => setAboutMe(event.target.value)}
                   />
                 </FormControl>
+                <Box>
+                  <Center>
+                    <Button colorScheme='teal' variant='ghost' onClick={onOpen}>
+                      {friendsList.length === 0 ? 'No' : friendsList.length} Friends
+                    </Button>
+                  </Center>
+                  <Drawer isOpen={isOpen} placement='right' onClose={onClose}>
+                    <DrawerOverlay />
+                    <DrawerContent>
+                      <DrawerCloseButton />
+                      <DrawerHeader>{props.openPlayer?.userName + "'s Friends"}</DrawerHeader>
+                      
+                      <DrawerBody>
+                        <VStack w={400} spacing={4} align='start'>
+                          {friendsList.map(friend => {
+                            return (
+                              <SelfFriendItem
+                                userName={friend}
+                                onRemove={async () => {
+                                  const newFriendsList = friendsList.filter(filteredName => filteredName !== friend);
+                                  setFriendsList(newFriendsList);
+                                  props.updateData(
+                                    imageList.length === 0
+                                      ? props.openPlayer?.profile.avatar
+                                      : imageList[0]['data_url'],
+                                    aboutMe,
+                                    newFriendsList,
+                                  );
+                                  const profile = {
+                                    username: props.openPlayer?.userName,
+                                    avatar: imageList.length === 0 ? props.openPlayer?.profile.avatar : imageList[0]['data_url'],
+                                    aboutMe: aboutMe,
+                                    friendsList: newFriendsList,
+                                  };
+                                  await axios
+                                    .post('http://localhost:4000/profiles/update', profile)
+                                    .then(res => {
+                                      console.log(res.data);
+                                    })
+                                    .catch(error => {
+                                      console.log(error);
+                                    });
+                                }}
+                              />
+                            );
+                          })}
+                        </VStack>
+                      </DrawerBody>
+                    </DrawerContent>
+                  </Drawer>
+                </Box>
                 <Stack spacing={6} direction={['column', 'row']}>
                   <Button
                     bg={'blue.400'}
@@ -172,13 +240,13 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                           ? props.openPlayer?.profile.avatar
                           : imageList[0]['data_url'],
                         aboutMe,
-                        props.openPlayer?.profile.friendsList,
+                        friendsList,
                       );
                       const profile = {
                         username: props.openPlayer?.userName,
                         avatar: imageList.length === 0 ? props.openPlayer?.profile.avatar : imageList[0]['data_url'],
                         aboutMe: aboutMe,
-                        friendsList: props.openPlayer?.profile.friendsList,
+                        friendsList: friendsList,
                       };
                       await axios
                         .post('http://localhost:4000/profiles/update', profile)

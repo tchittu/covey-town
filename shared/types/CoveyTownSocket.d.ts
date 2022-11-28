@@ -35,7 +35,7 @@ export interface Player {
 export interface PlayerProfile {
   avatar: string;
   aboutMe: string;
-  friendsList: Friend[];
+  friendsList: string[];
 }
 
 export type XY = { x: number; y: number };
