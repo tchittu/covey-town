@@ -1,6 +1,12 @@
+import { toast, useToast } from '@chakra-ui/react';
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
-import { Player as PlayerModel, PlayerLocation, PlayerProfile } from '../types/CoveyTownSocket';
+import {
+  ChatMessage,
+  Player as PlayerModel,
+  PlayerLocation,
+  PlayerProfile,
+} from '../types/CoveyTownSocket';
 
 export type PlayerEvents = {
   movement: (newLocation: PlayerLocation) => void;
@@ -21,6 +27,16 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   private readonly _userName: string;
 
   public gameObjects?: PlayerGameObjects;
+
+  private _inbox: ChatMessage[] = [];
+
+  get inbox() {
+    return this._inbox;
+  }
+
+  set inbox(newList: ChatMessage[]) {
+    this._inbox = newList;
+  }
 
   constructor(
     id: string,
@@ -89,5 +105,18 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
       modelPlayer.location,
       modelPlayer.profile,
     );
+  }
+
+  /**
+   * Adds the incoming message to this player's inbox
+   * @param message
+   */
+  public receiveMessage(message: ChatMessage): void {
+    this._inbox.push(message);
+    //console.log('player receive', message.body);
+  }
+
+  public clearInbox(): void {
+    this._inbox = [];
   }
 }

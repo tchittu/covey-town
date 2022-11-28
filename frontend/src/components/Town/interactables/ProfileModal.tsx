@@ -5,6 +5,8 @@ import {
   Button,
   ButtonGroup,
   Center,
+  FormControl,
+  FormLabel,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -20,16 +22,19 @@ import {
   ModalOverlay,
   Stack,
   Text,
+  Textarea,
   useColorModeValue,
   useDisclosure,
   VStack,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import { nanoid } from 'nanoid';
 import React, { useCallback, useEffect, useState } from 'react';
 import PlayerController from '../../../classes/PlayerController';
 import useTownController from '../../../hooks/useTownController';
+import { ChatMessage } from '../../../types/CoveyTownSocket';
 
-interface ProfileModalProps {
+export interface ProfileModalProps {
   open: boolean;
   openPlayer: PlayerController | undefined;
   handleClick: () => void;
@@ -43,6 +48,7 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
   const [isFriend, setIsFriend] = useState<boolean>(
     props.self.profile.friendsList.some(x => x === props.openPlayer?.userName),
   );
+  const [message, setMessage] = useState<string>('hello!');
 
   useEffect(() => {
     if (props.open) {
@@ -189,16 +195,40 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
               </Drawer>
             </Box>
 
-            <Stack mt={8} direction={'row'} spacing={4}>
-              <Button
-                flex={1}
-                fontSize={'sm'}
-                rounded={'full'}
-                _focus={{
-                  bg: 'gray.200',
-                }}>
-                Message
-              </Button>
+            <Stack mt={8} direction={'column'} spacing={4}>
+              <FormControl id='message' isRequired={false}>
+                <FormLabel>Message</FormLabel>
+                <Textarea
+                  placeholder='message'
+                  _placeholder={{ color: 'gray.500' }}
+                  onChange={event => setMessage(event.target.value)}
+                />
+              </FormControl>
+              <Stack mt={8} direction={'row'} spacing={4}>
+                <Button
+                  flex={1}
+                  fontSize={'sm'}
+                  rounded={'full'}
+                  _focus={{
+                    bg: 'gray.200',
+                  }}
+                  onClick={() => {
+                    if (props.openPlayer) {
+                      const chatMess: ChatMessage = {
+                        author: coveyTownController.ourPlayer.userName,
+                        sid: nanoid(),
+                        body: message,
+                        dateCreated: new Date(),
+                      };
+                      console.log('create', message);
+                      coveyTownController.emitDirectMessage({
+                        message: chatMess,
+                        toPlayer: props.openPlayer.userName,
+                      });
+                    }
+                  }}>
+                  Send Message
+                </Button>
               <Button
                 flex={1}
                 fontSize={'sm'}
@@ -265,6 +295,7 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                 }}>
                 {isFriend ? 'Remove Friend' : 'Add Friend'}
               </Button>
+              </Stack>
             </Stack>
           </Box>
         </Center>

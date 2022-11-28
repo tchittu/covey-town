@@ -36,6 +36,7 @@ export interface PlayerProfile {
   avatar: string;
   aboutMe: string;
   friendsList: string[];
+  inbox?: ChatMessage[];
 }
 
 export type XY = { x: number; y: number };
@@ -55,6 +56,11 @@ export type ChatMessage = {
   sid: string;
   body: string;
   dateCreated: Date;
+};
+
+export type DirectMessage = {
+  message: ChatMessage;
+  toPlayer: string;
 };
 
 export interface ConversationArea {
@@ -86,6 +92,7 @@ export interface ServerToClientEvents {
   chatMessage: (message: ChatMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
   playerUpdated: (updatedPlayer: Player) => void;
+  directMessage: ({message: ChatMessage, toPlayer: string}: DirectMessage) => void;
 }
 
 export interface ClientToServerEvents {
@@ -93,4 +100,5 @@ export interface ClientToServerEvents {
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
   playerUpdate: (newPlayerProfile: PlayerProfile) => void;
+  directMessage: ({message: ChatMessage, toPlayer: string}: DirectMessage) => void;
 }
