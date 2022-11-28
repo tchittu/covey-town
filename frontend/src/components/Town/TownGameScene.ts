@@ -568,6 +568,7 @@ export default class TownGameScene extends Phaser.Scene {
       }
       this._previouslyCapturedKeys = this.input.keyboard.getCaptures();
       this.input.keyboard.clearCaptures();
+      this.input.mouse.enabled = false;
     }
   }
 
@@ -576,6 +577,9 @@ export default class TownGameScene extends Phaser.Scene {
       this._paused = false;
       if (this.input && this.input.keyboard) {
         this.input.keyboard.addCapture(this._previouslyCapturedKeys);
+      }
+      if (this.input && !this.input.mouse.enabled) {
+        this.input.mouse.enabled = true;
       }
       this._previouslyCapturedKeys = [];
     }

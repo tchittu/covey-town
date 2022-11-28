@@ -40,7 +40,9 @@ interface ProfileModalProps {
 export default function ProfileModal(props: ProfileModalProps): JSX.Element {
   const coveyTownController = useTownController();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isFriend, setIsFriend] = useState<boolean>(false);
+  const [isFriend, setIsFriend] = useState<boolean>(
+    props.self.profile.friendsList.some(x => x === props.openPlayer?.userName),
+  );
 
   useEffect(() => {
     if (props.open) {
@@ -48,6 +50,20 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
     } else {
       coveyTownController.unPause();
     }
+
+    const getDBProfile = async () => {
+      await axios
+        .get('http://localhost:4000/profiles/' + props.self.userName)
+        .then(res => {
+          props.updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    };
+
+    getDBProfile();
+
     setIsFriend(props.self.profile.friendsList.some(x => x === props.openPlayer?.userName));
   }, [coveyTownController, props.open]);
 
@@ -139,7 +155,7 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                         });
                         return (
                           <HStack key={friend} spacing={3}>
-                            {/* <Avatar src={friend.avatar} /> */}
+                            <Avatar />
                             <Heading fontSize={18} color='teal.900'>
                               {friend}
                             </Heading>

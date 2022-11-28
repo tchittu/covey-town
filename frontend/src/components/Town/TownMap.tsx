@@ -1,3 +1,4 @@
+import axios from 'axios';
 import Phaser from 'phaser';
 import React, { useEffect } from 'react';
 import PlayerController from '../../classes/PlayerController';
@@ -57,6 +58,20 @@ export default function TownMap(): JSX.Element {
     const unPauseListener = newGameScene.resume.bind(newGameScene);
     coveyTownController.addListener('pause', pauseListener);
     coveyTownController.addListener('unPause', unPauseListener);
+
+    const getDBProfile = async () => {
+      await axios
+        .get('http://localhost:4000/profiles/' + coveyTownController.ourPlayer.userName)
+        .then(res => {
+          updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    };
+
+    getDBProfile();
+
     return () => {
       coveyTownController.removeListener('pause', pauseListener);
       coveyTownController.removeListener('unPause', unPauseListener);
