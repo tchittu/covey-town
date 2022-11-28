@@ -1,7 +1,7 @@
 import { useToast } from '@chakra-ui/react';
 import Phaser from 'phaser';
 import React, { useEffect } from 'react';
-import { ChatMessage } from '../../../../shared/types/CoveyTownSocket';
+import { ChatMessage, DirectMessage } from '../../../../shared/types/CoveyTownSocket';
 import PlayerController from '../../classes/PlayerController';
 import useTownController from '../../hooks/useTownController';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
@@ -72,7 +72,7 @@ export default function TownMap(): JSX.Element {
     coveyTownController.addListener('pause', pauseListener);
     coveyTownController.addListener('unPause', unPauseListener);
 
-    const receiveMessage = (message: ChatMessage, toPlayer: string) => {
+    const receiveMessage = ({ message, toPlayer }: DirectMessage) => {
       const userName = coveyTownController.ourPlayer.userName;
       if (userName === toPlayer) {
         coveyTownController.ourPlayer.receiveMessage(message);
@@ -105,7 +105,12 @@ export default function TownMap(): JSX.Element {
   ) : (
     <div id='app-container'>
       <NewConversationModal />
-      <ProfileModal open={openProfile} openPlayer={openPlayer} handleClick={handleClose} />
+      <ProfileModal
+        open={openProfile}
+        openPlayer={openPlayer}
+        handleClick={handleClose}
+        updateData={updateData}
+      />
       <div id='map-container' />
       <SocialSidebar />
     </div>

@@ -173,7 +173,10 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                         dateCreated: new Date(),
                       };
                       console.log('create', message);
-                      coveyTownController.emitDirectMessage(chatMess, props.openPlayer.userName);
+                      coveyTownController.emitDirectMessage({
+                        message: chatMess,
+                        toPlayer: props.openPlayer.userName,
+                      });
                     }
                   }}>
                   Send Message

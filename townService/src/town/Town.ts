@@ -139,8 +139,8 @@ export default class Town {
     });
 
     // Set up a listener to forward all direct messages to all clients in the town
-    socket.on('directMessage', (message: ChatMessage, toPlayer: string) => {
-      this._broadcastEmitter.emit('directMessage', message, toPlayer);
+    socket.on('directMessage', ({ message, toPlayer }) => {
+      this._broadcastEmitter.emit('directMessage', { message, toPlayer });
     });
 
     // Register an event listener for the client socket: if the client updates their

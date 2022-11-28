@@ -11,6 +11,7 @@ import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
 import {
   ChatMessage,
+  DirectMessage,
   CoveyTownSocket,
   PlayerLocation,
   PlayerProfile,
@@ -79,7 +80,7 @@ export type TownEvents = {
   /**
    * An event that indicates that a new direct message has been received, which is the parameter passed to the listener
    */
-  directMessage: (message: ChatMessage, toPlayer: string) => void;
+  directMessage: ({ message, toPlayer }: DirectMessage) => void;
   /**
    * An event that indicates that the 2D game is now paused. Pausing the game should, if nothing else,
    * release all key listeners, so that text entry is possible
@@ -349,8 +350,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     /**
      * On direct messages, forward the messages to listeners who subscribe to the controller's events
      */
-    this._socket.on('directMessage', (message, toPlayer) => {
-      this.emit('directMessage', message, toPlayer);
+    this._socket.on('directMessage', ({ message, toPlayer }) => {
+      this.emit('directMessage', { message, toPlayer });
     });
     /**
      * On changes to town settings, update the local state and emit a townSettingsUpdated event to
@@ -494,8 +495,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * @param message
    * @param toPlayer
    */
-  public emitDirectMessage(message: ChatMessage, toPlayer: string) {
-    this._socket.emit('directMessage', message, toPlayer);
+  public emitDirectMessage({ message, toPlayer }: DirectMessage) {
+    this._socket.emit('directMessage', { message, toPlayer });
   }
 
   /**

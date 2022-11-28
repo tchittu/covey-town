@@ -113,9 +113,6 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
    */
   public receiveMessage(message: ChatMessage): void {
     this._inbox.push(message);
-    if (this._profile.receiveMessage) {
-      this._profile.receiveMessage(message);
-    }
     //console.log('player receive', message.body);
   }
 }
