@@ -50,22 +50,11 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
     } else {
       coveyTownController.unPause();
     }
-
-    const getDBProfile = async () => {
-      await axios
-        .get('http://localhost:4000/profiles/' + props.self.userName)
-        .then(res => {
-          props.updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    };
-
-    getDBProfile();
-
-    setIsFriend(props.self.profile.friendsList.some(x => x === props.openPlayer?.userName));
   }, [coveyTownController, props.open]);
+
+  useEffect(() => {
+    setIsFriend(props.self.profile.friendsList.some(x => x === props.openPlayer?.userName));
+  });
 
   const closeModal = useCallback(() => {
     coveyTownController.unPause();
