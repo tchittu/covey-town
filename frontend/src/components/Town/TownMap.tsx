@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useToast } from '@chakra-ui/react';
 import Phaser from 'phaser';
 import React, { useEffect } from 'react';
@@ -16,11 +17,11 @@ export default function TownMap(): JSX.Element {
   const [openPlayer, setOpenPlayer] = React.useState<PlayerController>();
   const [isSelf, setIsSelf] = React.useState(false);
   const handleClose = () => setOpenProfile(false);
-  const updateData = (newAvatar: string | undefined, newAboutMe: string) => {
+  const updateData = (newAvatar: string | undefined, newAboutMe: string, friendsList: string[]) => {
     coveyTownController.emitPlayerUpdate({
       avatar: newAvatar == undefined ? '' : newAvatar,
       aboutMe: newAboutMe,
-      friendsList: [],
+      friendsList: friendsList,
     });
   };
 
@@ -72,6 +73,19 @@ export default function TownMap(): JSX.Element {
     coveyTownController.addListener('pause', pauseListener);
     coveyTownController.addListener('unPause', unPauseListener);
 
+    const getDBProfile = async () => {
+      await axios
+        .get('http://localhost:4000/profiles/' + coveyTownController.ourPlayer.userName)
+        .then(res => {
+          updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    };
+
+    getDBProfile();
+
     const receiveMessage = ({ message, toPlayer }: DirectMessage) => {
       const userName = coveyTownController.ourPlayer.userName;
       if (userName === toPlayer) {
@@ -110,6 +124,7 @@ export default function TownMap(): JSX.Element {
         openPlayer={openPlayer}
         handleClick={handleClose}
         updateData={updateData}
+        self={coveyTownController.ourPlayer}
       />
       <div id='map-container' />
       <SocialSidebar />

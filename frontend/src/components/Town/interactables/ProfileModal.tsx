@@ -27,6 +27,7 @@ import {
   useDisclosure,
   VStack,
 } from '@chakra-ui/react';
+import axios from 'axios';
 import { nanoid } from 'nanoid';
 import React, { useCallback, useEffect, useState } from 'react';
 import PlayerController from '../../../classes/PlayerController';
@@ -37,16 +38,16 @@ export interface ProfileModalProps {
   open: boolean;
   openPlayer: PlayerController | undefined;
   handleClick: () => void;
-  updateData: (
-    avatar: string | undefined,
-    aboutMe: string,
-    friendsList: string[] | undefined,
-  ) => void;
+  updateData: (avatar: string | undefined, aboutMe: string, friendsList: string[]) => void;
+  self: PlayerController;
 }
 
 export default function ProfileModal(props: ProfileModalProps): JSX.Element {
   const coveyTownController = useTownController();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isFriend, setIsFriend] = useState<boolean>(
+    props.self.profile.friendsList.some(x => x === props.openPlayer?.userName),
+  );
   const [message, setMessage] = useState<string>('hello!');
 
   useEffect(() => {
@@ -57,10 +58,23 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
     }
   }, [coveyTownController, props.open]);
 
+  useEffect(() => {
+    setIsFriend(props.self.profile.friendsList.some(x => x === props.openPlayer?.userName));
+  });
+
   const closeModal = useCallback(() => {
     coveyTownController.unPause();
     props.handleClick();
   }, [coveyTownController, props.handleClick]);
+  console.log(
+    'self: ',
+    props.self.userName,
+    ' selfFriends: ',
+    props.self.profile.friendsList,
+    ' openPlayer: ',
+    props.openPlayer?.userName,
+    isFriend,
+  );
   return (
     <Modal
       closeOnOverlayClick={false}
@@ -125,6 +139,15 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                   <DrawerBody>
                     <VStack w={400} spacing={4} align='start'>
                       {props.openPlayer?.profile.friendsList.map(friend => {
+                        let isHidden = false;
+                        if (friend === coveyTownController.ourPlayer.userName) {
+                          isHidden = true;
+                        }
+                        coveyTownController.ourPlayer.profile.friendsList.map(ourFriend => {
+                          if (ourFriend === friend) {
+                            isHidden = true;
+                          }
+                        });
                         return (
                           <HStack key={friend} spacing={3}>
                             <Avatar />
@@ -133,9 +156,34 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                             </Heading>
                             <ButtonGroup>
                               <IconButton
+                                hidden={isHidden}
                                 aria-label='Add to friends'
                                 size='xs'
                                 icon={<AddIcon />}
+                                onClick={async () => {
+                                  coveyTownController.ourPlayer.profile.friendsList.push(friend);
+                                  props.updateData(
+                                    coveyTownController.ourPlayer.profile.avatar,
+                                    coveyTownController.ourPlayer.profile.aboutMe,
+                                    coveyTownController.ourPlayer.profile.friendsList,
+                                  );
+                                  const profile = {
+                                    username: coveyTownController.ourPlayer.userName,
+                                    avatar: coveyTownController.ourPlayer.profile.avatar,
+                                    aboutMe: coveyTownController.ourPlayer.profile.aboutMe,
+                                    friendsList: coveyTownController.ourPlayer.profile.friendsList,
+                                  };
+                                  await axios
+                                    .post('http://localhost:4000/profiles/update', profile)
+                                    .then(res => {
+                                      console.log(profile);
+                                      console.log(res.data);
+                                    })
+                                    .catch(error => {
+                                      console.log(error);
+                                    });
+                                  props.handleClick();
+                                }}
                               />
                             </ButtonGroup>
                           </HStack>
@@ -181,23 +229,72 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                   }}>
                   Send Message
                 </Button>
-                <Button
-                  flex={1}
-                  fontSize={'sm'}
-                  rounded={'full'}
-                  bg={'blue.400'}
-                  color={'white'}
-                  boxShadow={
-                    '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+              <Button
+                flex={1}
+                fontSize={'sm'}
+                rounded={'full'}
+                bg={'blue.400'}
+                color={'white'}
+                boxShadow={
+                  '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+                }
+                _hover={{
+                  bg: 'blue.500',
+                }}
+                _focus={{
+                  bg: 'blue.500',
+                }}
+                onClick={async () => {
+                  if (isFriend) {
+                    props.updateData(
+                      props.self.profile.avatar,
+                      props.self.profile.aboutMe,
+                      props.self.profile.friendsList.filter(x => x !== props.openPlayer!.userName),
+                    );
+                    const profile = {
+                      username: props.self.userName,
+                      friendsList: props.self.profile.friendsList.filter(
+                        x => x !== props.openPlayer!.userName,
+                      ),
+                    };
+                    await axios
+                      .post('http://localhost:4000/profiles/addFriend', profile)
+                      .then(res => {
+                        console.log(res.data);
+                      })
+                      .catch(error => {
+                        console.log(error);
+                      });
+                    setIsFriend(false);
+                    props.handleClick();
+                  } else {
+                    const newFriendsList = props.self.profile.friendsList;
+                    if (newFriendsList.findIndex(x => x === props.openPlayer!.userName) == -1) {
+                      newFriendsList.push(props.openPlayer!.userName);
+                    }
+                    props.updateData(
+                      props.self.profile.avatar,
+                      props.self.profile.aboutMe,
+                      newFriendsList,
+                    );
+                    const profile = {
+                      username: props.self.userName,
+                      friendsList: newFriendsList,
+                    };
+                    await axios
+                      .post('http://localhost:4000/profiles/addFriend', profile)
+                      .then(res => {
+                        console.log(res.data);
+                      })
+                      .catch(error => {
+                        console.log(error);
+                      });
+                    setIsFriend(true);
+                    props.handleClick();
                   }
-                  _hover={{
-                    bg: 'blue.500',
-                  }}
-                  _focus={{
-                    bg: 'blue.500',
-                  }}>
-                  Add Friend
-                </Button>
+                }}>
+                {isFriend ? 'Remove Friend' : 'Add Friend'}
+              </Button>
               </Stack>
             </Stack>
           </Box>

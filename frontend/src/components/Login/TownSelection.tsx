@@ -82,7 +82,7 @@ export default function TownSelection(): JSX.Element {
         const playerProfile: PlayerProfile = {
           avatar: '',
           aboutMe: '',
-          friendsList: ['starter_friend_1', 'starter_friend_2', 'starter_friend_3'],
+          friendsList: [],
         };
         const newController = new TownController({
           userName,

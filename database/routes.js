@@ -87,6 +87,28 @@ profileRoutes.route("/profiles/update").post(async function (req, response) {
     $set: {
       avatar: req.body.avatar,
       aboutMe: req.body.aboutMe,
+      friendsList: req.body.friendsList,
+    },
+  };
+  db_connect
+    .collection("profiles")
+    .updateOne(myquery, newvalues, function (err, res) {
+      if (err) throw err;
+      console.log(
+        `${res.matchedCount} document(s) matched the query criteria.`
+      );
+      console.log(`${res.modifiedCount} document(s) was/were updated.`);
+      response.json(res);
+    });
+});
+
+// Update friends list
+profileRoutes.route("/profiles/addFriend").post(async function (req, response) {
+  let db_connect = dbo.getDb();
+  let myquery = { username: req.body.username };
+  let newvalues = {
+    $set: {
+      friendsList: req.body.friendsList,
     },
   };
   db_connect
