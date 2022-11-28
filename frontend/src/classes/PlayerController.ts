@@ -115,4 +115,8 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._inbox.push(message);
     //console.log('player receive', message.body);
   }
+
+  public clearInbox(): void {
+    this._inbox = [];
+  }
 }

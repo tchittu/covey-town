@@ -21,7 +21,7 @@ import {
 import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ProfileModalProps } from './ProfileModal';
-import TwoPlayerChat, { inboxToText } from './TwoPlayerChat';
+import { inboxToText } from './Inbox';
 import ImageUploading, { ImageListType, ImageType } from 'react-images-uploading';
 import PlayerController from '../../../classes/PlayerController';
 import useTownController from '../../../hooks/useTownController';
@@ -41,6 +41,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
   }, []);
   const [images, setImages] = useState([]);
   const [aboutMe, setAboutMe] = useState('');
+  const [inbox, setInbox] = useState(props.openPlayer?.inbox || [])
   const getDBProfile = async () => {
     await axios
     .get('http://localhost:4000/profiles/' + props.openPlayer?.userName)
@@ -199,9 +200,18 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
             <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
               Inbox
             </Heading>
-            <div style={{ whiteSpace: 'pre-wrap' }}>
-              {inboxToText(props.openPlayer?.inbox || [])}
+              <div style={{ whiteSpace: 'pre-wrap' }}>
+                {inboxToText(props.openPlayer?.inbox || [])}
               </div>
+              <Button
+              onClick={() => {
+                if (props.openPlayer) {
+                  setInbox([]);
+                  props.openPlayer?.clearInbox();
+                }
+              }}>
+                Clear Inbox
+              </Button>
             </Stack>
            )}
             </ImageUploading> 
