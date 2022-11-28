@@ -5,14 +5,14 @@ import {
   Button,
   ButtonGroup,
   Center,
-  FormControl,
-  FormLabel,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
   DrawerOverlay,
+  FormControl,
+  FormLabel,
   Heading,
   HStack,
   IconButton,
@@ -66,15 +66,7 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
     coveyTownController.unPause();
     props.handleClick();
   }, [coveyTownController, props.handleClick]);
-  console.log(
-    'self: ',
-    props.self.userName,
-    ' selfFriends: ',
-    props.self.profile.friendsList,
-    ' openPlayer: ',
-    props.openPlayer?.userName,
-    isFriend,
-  );
+
   return (
     <Modal
       closeOnOverlayClick={false}
@@ -225,76 +217,79 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                         message: chatMess,
                         toPlayer: props.openPlayer.userName,
                       });
+                      props.handleClick();
                     }
                   }}>
                   Send Message
                 </Button>
-              <Button
-                flex={1}
-                fontSize={'sm'}
-                rounded={'full'}
-                bg={'blue.400'}
-                color={'white'}
-                boxShadow={
-                  '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
-                }
-                _hover={{
-                  bg: 'blue.500',
-                }}
-                _focus={{
-                  bg: 'blue.500',
-                }}
-                onClick={async () => {
-                  if (isFriend) {
-                    props.updateData(
-                      props.self.profile.avatar,
-                      props.self.profile.aboutMe,
-                      props.self.profile.friendsList.filter(x => x !== props.openPlayer!.userName),
-                    );
-                    const profile = {
-                      username: props.self.userName,
-                      friendsList: props.self.profile.friendsList.filter(
-                        x => x !== props.openPlayer!.userName,
-                      ),
-                    };
-                    await axios
-                      .post('http://localhost:4000/profiles/addFriend', profile)
-                      .then(res => {
-                        console.log(res.data);
-                      })
-                      .catch(error => {
-                        console.log(error);
-                      });
-                    setIsFriend(false);
-                    props.handleClick();
-                  } else {
-                    const newFriendsList = props.self.profile.friendsList;
-                    if (newFriendsList.findIndex(x => x === props.openPlayer!.userName) == -1) {
-                      newFriendsList.push(props.openPlayer!.userName);
-                    }
-                    props.updateData(
-                      props.self.profile.avatar,
-                      props.self.profile.aboutMe,
-                      newFriendsList,
-                    );
-                    const profile = {
-                      username: props.self.userName,
-                      friendsList: newFriendsList,
-                    };
-                    await axios
-                      .post('http://localhost:4000/profiles/addFriend', profile)
-                      .then(res => {
-                        console.log(res.data);
-                      })
-                      .catch(error => {
-                        console.log(error);
-                      });
-                    setIsFriend(true);
-                    props.handleClick();
+                <Button
+                  flex={1}
+                  fontSize={'sm'}
+                  rounded={'full'}
+                  bg={'blue.400'}
+                  color={'white'}
+                  boxShadow={
+                    '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
                   }
-                }}>
-                {isFriend ? 'Remove Friend' : 'Add Friend'}
-              </Button>
+                  _hover={{
+                    bg: 'blue.500',
+                  }}
+                  _focus={{
+                    bg: 'blue.500',
+                  }}
+                  onClick={async () => {
+                    if (isFriend) {
+                      props.updateData(
+                        props.self.profile.avatar,
+                        props.self.profile.aboutMe,
+                        props.self.profile.friendsList.filter(
+                          x => x !== props.openPlayer!.userName,
+                        ),
+                      );
+                      const profile = {
+                        username: props.self.userName,
+                        friendsList: props.self.profile.friendsList.filter(
+                          x => x !== props.openPlayer!.userName,
+                        ),
+                      };
+                      await axios
+                        .post('http://localhost:4000/profiles/addFriend', profile)
+                        .then(res => {
+                          console.log(res.data);
+                        })
+                        .catch(error => {
+                          console.log(error);
+                        });
+                      setIsFriend(false);
+                      props.handleClick();
+                    } else {
+                      const newFriendsList = props.self.profile.friendsList;
+                      if (newFriendsList.findIndex(x => x === props.openPlayer!.userName) == -1) {
+                        newFriendsList.push(props.openPlayer!.userName);
+                      }
+                      props.updateData(
+                        props.self.profile.avatar,
+                        props.self.profile.aboutMe,
+                        newFriendsList,
+                      );
+                      const profile = {
+                        username: props.self.userName,
+                        friendsList: newFriendsList,
+                      };
+                      await axios
+                        .post('http://localhost:4000/profiles/addFriend', profile)
+                        .then(res => {
+                          console.log(res.data);
+                        })
+                        .catch(error => {
+                          console.log(error);
+                        });
+                      setIsFriend(true);
+                      props.handleClick();
+                    }
+                  }}>
+                  {isFriend ? 'Remove Friend' : 'Add Friend'}
+                </Button>
               </Stack>
             </Stack>
           </Box>

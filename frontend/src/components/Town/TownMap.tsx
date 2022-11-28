@@ -1,8 +1,7 @@
 import axios from 'axios';
-import { useToast } from '@chakra-ui/react';
 import Phaser from 'phaser';
 import React, { useEffect } from 'react';
-import { ChatMessage, DirectMessage } from '../../../../shared/types/CoveyTownSocket';
+import { DirectMessage } from '../../../../shared/types/CoveyTownSocket';
 import PlayerController from '../../classes/PlayerController';
 import useTownController from '../../hooks/useTownController';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
@@ -24,18 +23,6 @@ export default function TownMap(): JSX.Element {
       friendsList: friendsList,
     });
   };
-
-  // useEffect(() => {
-  //   coveyTownController.addListener('chatMessage',
-  //   (message: ChatMessage) => {
-  //     openPlayer?.receiveMessage(message);
-  //     console.log(openPlayer);
-  //     // const newInbox = [...inbox];
-  //     // newInbox.push(message);
-  //     // setInbox(newInbox);
-  //     console.log('receive', message.body);
-  //   })
-  // }, [])
 
   useEffect(() => {
     const config = {

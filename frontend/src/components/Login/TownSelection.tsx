@@ -23,7 +23,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import TownController from '../../classes/TownController';
 import { Town } from '../../generated/client';
 import useLoginController from '../../hooks/useLoginController';
-import { ChatMessage, PlayerProfile } from '../../types/CoveyTownSocket';
+import { PlayerProfile } from '../../types/CoveyTownSocket';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 
 export default function TownSelection(): JSX.Element {
