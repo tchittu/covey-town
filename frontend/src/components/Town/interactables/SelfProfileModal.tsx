@@ -7,6 +7,7 @@ import {
   FormControl,
   FormLabel,
   Heading,
+  Input,
   Modal,
   ModalCloseButton,
   ModalContent,
@@ -19,11 +20,12 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ProfileModalProps } from './ProfileModalProps';
-import TwoPlayerChat, { inboxToText } from './TwoPlayerChat';
-import ImageUploading, { ImageListType } from 'react-images-uploading';
+import { ProfileModalProps } from './ProfileModal';
+import { inboxToText } from './Inbox';
+import ImageUploading, { ImageListType, ImageType } from 'react-images-uploading';
 import PlayerController from '../../../classes/PlayerController';
 import useTownController from '../../../hooks/useTownController';
+import { ExportInterface } from 'react-images-uploading/dist/typings';
 
 const MAX_IMAGE_SIZE = 209715;
 interface SelfProfileModalProps {
@@ -39,6 +41,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
   }, []);
   const [images, setImages] = useState([]);
   const [aboutMe, setAboutMe] = useState('');
+  const [inbox, setInbox] = useState(props.openPlayer?.inbox || [])
   const getDBProfile = async () => {
     await axios
     .get('http://localhost:4000/profiles/' + props.openPlayer?.userName)
@@ -75,7 +78,6 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
     props.handleClick();
   }, [coveyTownController, props.handleClick]);
 
-
   return (
     <Modal
       closeOnOverlayClick={false}
@@ -84,16 +86,16 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
         closeModal();
         coveyTownController.unPause();
       }}>
-      <ModalOverlay />
+      <ModalOverlay/>
       <ModalContent>
         <ModalCloseButton autoFocus={false} />
         <Flex align={'center'} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
-          <ImageUploading
+        <ImageUploading 
             value={images}
             onChange={onChange}
             dataURLKey='data_url'
             maxFileSize={MAX_IMAGE_SIZE}
-            onError={(errors, files) => {
+            onError={(errors: any, files: any) => {
               console.log('Error: ', errors);
               toast({
                 title: 'Error uploading image',
@@ -114,8 +116,8 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                 duration: 4000,
               });
             }}>
-            {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove }) => (
-              <Stack
+        {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove }) => (
+          <Stack
                 spacing={4}
                 w={'full'}
                 maxW={'md'}
@@ -141,7 +143,9 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                       </div>
                     </Center>
                     <Center w='full'>
-                      <Button w='full' onClick={onImageUpload}>
+                      <Button w='full' 
+                      onClick={onImageUpload}
+                      >
                         Change Avatar
                       </Button>
                     </Center>
@@ -168,7 +172,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                       bg: 'blue.500',
                     }}
                     onClick={async () => {
-                      //console.log('click: ', imageList[0]['data_url']);
+                      console.log('click: ', imageList[0]['data_url']);
                       props.updateData(
                         imageList.length === 0
                           ? props.openPlayer?.profile.avatar
@@ -193,47 +197,24 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                     Submit
                   </Button>
                 </Stack>
-              </Stack>
-          )}
-          </ImageUploading>
-            </FormControl>
-            <FormControl id='userName' isRequired>
-              <FormLabel>User name</FormLabel>
-              <Input
-                defaultValue={props.openPlayer?.userName}
-                placeholder='UserName'
-                _placeholder={{ color: 'gray.500' }}
-                type='text'
-              />
-            </FormControl>
-            <FormControl id='aboutMe' isRequired={false}>
-              <FormLabel>About Me</FormLabel>
-              <Textarea
-                defaultValue={props.openPlayer?.profile.aboutMe}
-                placeholder='aboutMe'
-                _placeholder={{ color: 'gray.500' }}
-              />
-            </FormControl>
-            <FormControl id='password' isRequired>
-              <FormLabel>Password</FormLabel>
-              <Input placeholder='password' _placeholder={{ color: 'gray.500' }} type='password' />
-            </FormControl>
-            <Stack spacing={6} direction={['column', 'row']}>
-              <Button
-                bg={'blue.400'}
-                color={'white'}
-                w='full'
-                _hover={{
-                  bg: 'blue.500',
-                }}>
-                Submit
-              </Button>
-            </Stack>
             <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
               Inbox
             </Heading>
-            <div style={{ whiteSpace: 'pre-wrap' }}>{inboxToText(props.openPlayer?.profile)}</div>
-          </Stack>
+              <div style={{ whiteSpace: 'pre-wrap' }}>
+                {inboxToText(props.openPlayer?.inbox || [])}
+              </div>
+              <Button
+              onClick={() => {
+                if (props.openPlayer) {
+                  setInbox([]);
+                  props.openPlayer?.clearInbox();
+                }
+              }}>
+                Clear Inbox
+              </Button>
+            </Stack>
+           )}
+            </ImageUploading> 
         </Flex>
       </ModalContent>
     </Modal>
