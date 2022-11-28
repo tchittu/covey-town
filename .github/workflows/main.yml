@@ -23,7 +23,7 @@ jobs:
           node-version: '16'
       # Start database
       - name: Connect to database
-        run: cd database; node server.js
+        run: cd database; npm install && npm install express && node server.js
 
       - name: Build and test backend service
         env: # Pass the Twilio secrets into environmental variables for the backend tests to use
