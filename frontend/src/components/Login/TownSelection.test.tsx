@@ -359,7 +359,7 @@ describe('Town Selection', () => {
               userName,
               townID: coveyTownID,
               loginController: mockLoginController,
-              playerProfile: {aboutMe: '', avatar: '', friendsList: []},
+              playerProfile: { aboutMe: '', avatar: '', friendsList: [] },
             }),
           );
           await waitFor(() => expect(mockedTownController.connect).toBeCalled());
@@ -486,7 +486,7 @@ describe('Town Selection', () => {
                     userName: username,
                     townID: town.townID,
                     loginController: mockLoginController,
-                    playerProfile: {aboutMe: '', avatar: '', friendsList: []},
+                    playerProfile: { aboutMe: '', avatar: '', friendsList: [] },
                   }),
                 );
 
@@ -709,7 +709,7 @@ describe('Town Selection', () => {
                 userName,
                 townID: townID,
                 loginController: mockLoginController,
-                playerProfile: {aboutMe: '', avatar: '', friendsList: []}
+                playerProfile: { aboutMe: '', avatar: '', friendsList: [] },
               }),
             );
             await waitFor(() => expect(mockedTownController.connect).toBeCalled());
