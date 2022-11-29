@@ -9,6 +9,7 @@ import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
   CoveyTownSocket,
+  DirectMessage,
   Interactable,
   PlayerLocation,
   PlayerProfile,
@@ -136,6 +137,11 @@ export default class Town {
     // Set up a listener to forward all chat messages to all clients in the town
     socket.on('chatMessage', (message: ChatMessage) => {
       this._broadcastEmitter.emit('chatMessage', message);
+    });
+
+    // Set up a listener to forward all direct messages to all clients in the town
+    socket.on('directMessage', ({message, toPlayer}: DirectMessage) => {
+      this._broadcastEmitter.emit('directMessage', {message, toPlayer});
     });
 
     // Register an event listener for the client socket: if the client updates their

@@ -1,4 +1,3 @@
-import { AddIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   Box,
@@ -27,9 +26,11 @@ import {
   useDisclosure,
   VStack,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect } from 'react';
+import { nanoid } from 'nanoid';
+import React, { useCallback, useEffect, useState } from 'react';
 import PlayerController from '../../../classes/PlayerController';
 import useTownController from '../../../hooks/useTownController';
+import { ChatMessage } from '../../../types/CoveyTownSocket';
 
 interface ProfileModalProps {
   open: boolean;
@@ -40,6 +41,7 @@ interface ProfileModalProps {
 export default function ProfileModal(props: ProfileModalProps): JSX.Element {
   const coveyTownController = useTownController();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
     if (props.open) {
@@ -127,7 +129,6 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                               <IconButton
                                 aria-label='Add to friends'
                                 size='xs'
-                                icon={<AddIcon />}
                               />
                             </ButtonGroup>
                           </HStack>
@@ -139,6 +140,15 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
               </Drawer>
             </Box>
 
+            <Stack mt={8} direction={'column'} spacing={4}>
+            <FormControl id='message' isRequired={false}>
+                <FormLabel>Message</FormLabel>
+                <Textarea
+                  placeholder='message'
+                  _placeholder={{ color: 'gray.500' }}
+                  onChange={event => setMessage(event.target.value)}
+                />
+              </FormControl>
             <Stack mt={8} direction={'row'} spacing={4}>
               <Button
                 flex={1}
@@ -146,8 +156,24 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                 rounded={'full'}
                 _focus={{
                   bg: 'gray.200',
+                }}
+                onClick={() => {
+                  if (props.openPlayer) {
+                    const chatMess: ChatMessage = {
+                      author: coveyTownController.ourPlayer.userName,
+                      sid: nanoid(),
+                      body: message,
+                      dateCreated: new Date(),
+                    };
+                    console.log('create', message);
+                    coveyTownController.emitDirectMessage({
+                      message: chatMess,
+                      toPlayer: props.openPlayer.userName,
+                    });
+                    props.handleClick();
+                  }
                 }}>
-                Message
+                Send Message
               </Button>
               <Button
                 flex={1}
@@ -166,6 +192,7 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                 }}>
                 Add Friend
               </Button>
+            </Stack>
             </Stack>
           </Box>
         </Center>

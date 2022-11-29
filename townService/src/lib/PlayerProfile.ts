@@ -125,7 +125,7 @@ export default class PlayerProfile {
    * database and update based on the profile username
    */
   private async _updateProfileInDB(): Promise<void> {
-    await axios.put('http://localhost:4000/profiles/update:username', this._toJSONObj());
+    await axios.put('http://localhost:8081/profiles/update:username', this._toJSONObj());
 
   }
 

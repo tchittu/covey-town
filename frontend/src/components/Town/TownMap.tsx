@@ -1,5 +1,7 @@
+import axios from 'axios';
 import Phaser from 'phaser';
 import React, { useEffect } from 'react';
+import { DirectMessage } from '../../../../shared/types/CoveyTownSocket';
 import PlayerController from '../../classes/PlayerController';
 import useTownController from '../../hooks/useTownController';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
@@ -14,11 +16,11 @@ export default function TownMap(): JSX.Element {
   const [openPlayer, setOpenPlayer] = React.useState<PlayerController>();
   const [isSelf, setIsSelf] = React.useState(false);
   const handleClose = () => setOpenProfile(false);
-  const updateData = (newAvatar: string | undefined, newAboutMe: string) => {
+  const updateData = (newAvatar: string | undefined, newAboutMe: string, friendsList: string[]) => {
     coveyTownController.emitPlayerUpdate({
       avatar: newAvatar == undefined ? '' : newAvatar,
       aboutMe: newAboutMe,
-      friendsList: [],
+      friendsList: friendsList,
     });
   };
 
@@ -57,9 +59,34 @@ export default function TownMap(): JSX.Element {
     const unPauseListener = newGameScene.resume.bind(newGameScene);
     coveyTownController.addListener('pause', pauseListener);
     coveyTownController.addListener('unPause', unPauseListener);
+
+    const getDBProfile = async () => {
+      await axios
+        .get('http://localhost:8081/profiles/' + coveyTownController.ourPlayer.userName)
+        .then(res => {
+          updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    };
+
+    getDBProfile();
+
+    const receiveMessage = ({ message, toPlayer }: DirectMessage) => {
+      const userName = coveyTownController.ourPlayer.userName;
+      if (userName === toPlayer) {
+        coveyTownController.ourPlayer.receiveMessage(message);
+      }
+      console.log('receive', message.body);
+    };
+    coveyTownController.addListener('directMessage', receiveMessage);
+
     return () => {
+      console.log(openPlayer);
       coveyTownController.removeListener('pause', pauseListener);
       coveyTownController.removeListener('unPause', unPauseListener);
+      coveyTownController.removeListener('directMessage', receiveMessage);
       game.destroy(true);
     };
   }, [coveyTownController]);
@@ -79,7 +106,13 @@ export default function TownMap(): JSX.Element {
   ) : (
     <div id='app-container'>
       <NewConversationModal />
-      <ProfileModal open={openProfile} openPlayer={openPlayer} handleClick={handleClose} />
+      <ProfileModal
+        open={openProfile}
+        openPlayer={openPlayer}
+        handleClick={handleClose}
+        updateData={updateData}
+        self={coveyTownController.ourPlayer}
+      />
       <div id='map-container' />
       <SocialSidebar />
     </div>

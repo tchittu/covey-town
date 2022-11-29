@@ -27,11 +27,21 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   public gameObjects?: PlayerGameObjects;
 
+  private _inbox: ChatMessage[] = [];
+
+  get inbox() {
+    return this._inbox;
+  }
+
+  set inbox(newList: ChatMessage[]) {
+    this._inbox = newList;
+  }
+
   constructor(
     id: string,
     userName: string,
     location: PlayerLocation,
-    profile: PlayerProfile = { avatar: 'default', aboutMe: 'default', friendsList: [], inbox: [] },
+    profile: PlayerProfile = { avatar: 'default', aboutMe: 'default', friendsList: [] },
   ) {
     super();
     this._id = id;
@@ -96,10 +106,16 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     );
   }
 
+  /**
+   * Adds the incoming message to this player's inbox
+   * @param message
+   */
   public receiveMessage(message: ChatMessage): void {
-    const newInbox: ChatMessage[] | undefined = this.profile.inbox?.concat([message]);
-    if (newInbox) {
-      this.profile.inbox = newInbox;
-    }
+    this._inbox.push(message);
+    //console.log('player receive', message.body);
+  }
+
+  public clearInbox(): void {
+    this._inbox = [];
   }
 }
