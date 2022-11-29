@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Phaser from 'phaser';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { DirectMessage } from '../../../../shared/types/CoveyTownSocket';
 import PlayerController from '../../classes/PlayerController';
 import useTownController from '../../hooks/useTownController';
@@ -16,13 +16,13 @@ export default function TownMap(): JSX.Element {
   const [openPlayer, setOpenPlayer] = React.useState<PlayerController>();
   const [isSelf, setIsSelf] = React.useState(false);
   const handleClose = () => setOpenProfile(false);
-  const updateData = (newAvatar: string | undefined, newAboutMe: string, friendsList: string[]) => {
+  const updateData = useCallback((newAvatar: string | undefined, newAboutMe: string, friendsList: string[]) => {
     coveyTownController.emitPlayerUpdate({
       avatar: newAvatar == undefined ? '' : newAvatar,
       aboutMe: newAboutMe,
       friendsList: friendsList,
     });
-  };
+  }, [coveyTownController]);
 
   useEffect(() => {
     const config = {
