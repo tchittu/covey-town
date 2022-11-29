@@ -1,4 +1,4 @@
-import { ChatIcon, SmallCloseIcon } from '@chakra-ui/icons';
+import { SmallCloseIcon } from '@chakra-ui/icons';
 import { Avatar, ButtonGroup, Heading, HStack, IconButton } from '@chakra-ui/react';
 import React from 'react';
 
@@ -15,12 +15,6 @@ export function SelfFriendItem(props: { userName: string; onRemove: () => void }
           size='xs'
           icon={<SmallCloseIcon />}
           onClick={props.onRemove}
-        />
-        <IconButton
-          aria-label='Chat'
-          size='xs'
-          icon={<ChatIcon />}
-          onClick={() => console.log('chat clicked')}
         />
       </ButtonGroup>
     </HStack>

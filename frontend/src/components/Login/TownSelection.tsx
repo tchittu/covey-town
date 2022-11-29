@@ -79,6 +79,16 @@ export default function TownSelection(): JSX.Element {
           });
           return;
         }
+
+        const profile = {
+          username: userName,
+          password: password,
+          avatar: '',
+          aboutMe: '',
+          friendsList: [],
+        };
+        await axios.post('http://localhost:4000/profiles/retrieveOrAdd', profile);
+
         const playerProfile: PlayerProfile = {
           avatar: '',
           aboutMe: '',
@@ -95,16 +105,6 @@ export default function TownSelection(): JSX.Element {
         assert(videoToken);
         await videoConnect(videoToken);
         setTownController(newController);
-
-        // try adding user to database
-        const profile = {
-          username: userName,
-          password: password,
-          avatar: '',
-          aboutMe: '',
-          friendsList: [],
-        };
-        await axios.post('http://localhost:4000/profiles/retrieveOrAdd', profile);
       } catch (err) {
         if (err instanceof AxiosError) {
           toast({
