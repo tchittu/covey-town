@@ -228,6 +228,7 @@ describe('ConversationAreasList', () => {
       await expectProperlyRenderedConversationAreas(renderData, shuffledAreas);
     });
     it('Displays player names in the order provided', async () => {
+      jest.setTimeout(10000);
       const areasProvidedInSortOrder = areas;
       const renderData = await renderConversationAreaList(areasProvidedInSortOrder);
       await expectProperlyRenderedConversationAreas(

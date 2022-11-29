@@ -108,13 +108,13 @@ export default function TownSelection(): JSX.Element {
       } catch (err) {
         if (err instanceof AxiosError) {
           toast({
-            title: 'Error 1',
+            title: 'Error',
             description: err.response?.data,
             status: 'error',
           });
         } else if (err instanceof Error) {
           toast({
-            title: 'Unable to connect to Towns Service 1',
+            title: 'Unable to connect to Towns Service',
             description: err.toString(),
             status: 'error',
           });
@@ -196,13 +196,13 @@ export default function TownSelection(): JSX.Element {
     } catch (err) {
       if (err instanceof AxiosError) {
         toast({
-          title: 'Error 2',
+          title: 'Error',
           description: err.response?.data,
           status: 'error',
         });
       } else if (err instanceof Error) {
         toast({
-          title: 'Unable to connect to Towns Service 2',
+          title: 'Unable to connect to Towns Service',
           description: err.toString(),
           status: 'error',
         });
