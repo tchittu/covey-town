@@ -16,13 +16,16 @@ export default function TownMap(): JSX.Element {
   const [openPlayer, setOpenPlayer] = React.useState<PlayerController>();
   const [isSelf, setIsSelf] = React.useState(false);
   const handleClose = () => setOpenProfile(false);
-  const updateData = useCallback((newAvatar: string | undefined, newAboutMe: string, friendsList: string[]) => {
-    coveyTownController.emitPlayerUpdate({
-      avatar: newAvatar == undefined ? '' : newAvatar,
-      aboutMe: newAboutMe,
-      friendsList: friendsList,
-    });
-  }, [coveyTownController]);
+  const updateData = useCallback(
+    (newAvatar: string | undefined, newAboutMe: string, friendsList: string[]) => {
+      coveyTownController.emitPlayerUpdate({
+        avatar: newAvatar == undefined ? '' : newAvatar,
+        aboutMe: newAboutMe,
+        friendsList: friendsList,
+      });
+    },
+    [coveyTownController],
+  );
 
   useEffect(() => {
     const config = {
