@@ -240,7 +240,6 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                       bg: 'blue.500',
                     }}
                     onClick={async () => {
-                      console.log('click: ', imageList[0]['data_url']);
                       props.updateData(
                         imageList.length === 0
                           ? props.openPlayer?.profile.avatar

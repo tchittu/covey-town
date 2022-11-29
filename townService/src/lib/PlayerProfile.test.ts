@@ -8,14 +8,8 @@ describe('PlayerProfile', () => {
   const username = 'username';
   const townEmitter = mock<TownEmitter>();
   const password = 'password';
-  const friend1 = {
-    username: 'friend1',
-    avatar: 'friend1',
-  };
-  const friend2 = {
-    username: 'friend2',
-    avatar: 'friend2',
-  };
+  const friend1 = 'friend1';
+  const friend2 = 'friend2';
   let profile: PlayerProfile;
   beforeEach(() => {
     mockClear(townEmitter);
@@ -86,15 +80,15 @@ describe('PlayerProfile', () => {
     it('adds the player friend if they are not already in the friendsList', () => {
       const friendProfile1 = new PlayerProfile('friendUserName1', 'friendPassword1');
       profile.addFriend(friendProfile1);
-      expect(profile.friendsList).toEqual(['friend1']);
+      expect(profile.friendsList).toEqual(['friendUserName1']);
     });
     it('does nothing if the given player is already in the friendsList', () => {
       const friendProfile1 = new PlayerProfile('friendUserName1', 'friendPassword1');
       profile.addFriend(friendProfile1);
-      expect(profile.friendsList).toEqual(['friend1']);
+      expect(profile.friendsList).toEqual(['friendUserName1']);
       expect(() => profile.addFriend(friendProfile1)).not.toThrowError();
       profile.addFriend(friendProfile1);
-      expect(profile.friendsList).toEqual(['friend1']);
+      expect(profile.friendsList).toEqual(['friendUserName1']);
     });
     it('does nothing if the given player is this player', () => {
       expect(() => profile.addFriend(profile)).not.toThrowError();
@@ -106,17 +100,17 @@ describe('PlayerProfile', () => {
     it('removes the given player if that player is in the friends list', () => {
       const friendProfile1 = new PlayerProfile('friendUserName1', 'friendPassword1');
       profile.addFriend(friendProfile1);
-      expect(profile.friendsList).toEqual(['friend1']);
+      expect(profile.friendsList).toEqual(['friendUserName1']);
       profile.removeFriend(friendProfile1);
       expect(profile.friendsList).toEqual([]);
     });
     it('does nothing if the given player is not in the friends list', () => {
-      const friendProfile1 = new PlayerProfile('friendPassword1', 'friendPassword1');
-      const friendProfile2 = new PlayerProfile('friendPassword2', 'friendPassword2');
+      const friendProfile1 = new PlayerProfile('friendUserName1', 'friendPassword1');
+      const friendProfile2 = new PlayerProfile('friendUserName2', 'friendPassword2');
       profile.addFriend(friendProfile2);
       expect(() => profile.removeFriend(friendProfile1)).not.toThrowError();
       profile.removeFriend(friendProfile1);
-      expect(profile.friendsList).toEqual(['friend2']);
+      expect(profile.friendsList).toEqual(['friendUserName2']);
     });
   });
 });

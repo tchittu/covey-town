@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { ChatMessage, PlayerProfile as PlayerProfileModel } from '../types/CoveyTownSocket';
 
 const DEFAULT_AVATAR = 'DefaultAvatar.png';
@@ -94,37 +93,11 @@ export default class PlayerProfile {
    */
   public removeFriend(friend: PlayerProfile): void {
     this.friendsList = this.friendsList.filter(name => name !== friend.username);
-
-    this._updateProfileInDB();
   }
 
   /** Adds the given message to this player's inbox. */
   public receiveMessage(message: ChatMessage) {
     this._inbox.push(message);
-  }
-
-  /**
-   * Takes the current parameters of the player profile and returns it as a single
-   * object to be used to send to the database as JSON.
-   * @returns an object containing all the parametes of a player profile
-   */
-  private _toJSONObj(): object {
-    const jsonObj = {
-      username: this.username,
-      password: this.password,
-      avatar: this._avatar,
-      aboutMe: this._aboutMe,
-      friendsList: this.friendsList,
-    };
-    return jsonObj;
-  }
-
-  /**
-   * API request using axios to send the updated player profile information to our
-   * database and update based on the profile username
-   */
-  private async _updateProfileInDB(): Promise<void> {
-    await axios.put('http://localhost:8081/profiles/update:username', this._toJSONObj());
   }
 
   public toProfileModel(): PlayerProfileModel {

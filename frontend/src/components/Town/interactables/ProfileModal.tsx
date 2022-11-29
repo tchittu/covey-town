@@ -276,7 +276,7 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                         friendsList: newFriendsList,
                       };
                       await axios
-                        .post('http://localhost:4000/profiles/addFriend', profile)
+                        .post('http://localhost:8081/profiles/addFriend', profile)
                         .then(res => {
                           console.log(res.data);
                         })

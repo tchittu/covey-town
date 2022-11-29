@@ -42,9 +42,11 @@ export default class Player {
     this._id = nanoid();
     this._sessionToken = nanoid();
     const playerProfile = new PlayerProfile('temp_username', 'temp_pass');
+    if (playerProfileModel !== undefined) {
     playerProfile.avatar = playerProfileModel.avatar;
     playerProfile.aboutMe = playerProfileModel.aboutMe;
     playerProfile.friendsList = playerProfileModel.friendsList;
+    }
     this._playerProfile = playerProfile;
     this.townEmitter = townEmitter;
   }
@@ -67,6 +69,10 @@ export default class Player {
 
   get sessionToken(): string {
     return this._sessionToken;
+  }
+
+  get playerProfile(): PlayerProfile {
+    return this._playerProfile;
   }
 
   updateProfile(profile: PlayerProfileModel) {

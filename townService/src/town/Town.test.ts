@@ -353,7 +353,13 @@ describe('Town', () => {
   beforeEach(async () => {
     town = new Town(nanoid(), false, nanoid(), townEmitter);
     playerTestData = mockPlayer(town.townID);
-    player = await town.addPlayer(playerTestData.userName, playerTestData.socket);
+    player = await town.addPlayer(
+      playerTestData.userName,
+      playerTestData.player === undefined
+        ? { avatar: '', aboutMe: '', friendsList: [] }
+        : playerTestData.player?.playerProfile,
+      playerTestData.socket,
+    );
     playerTestData.player = player;
     // Set this dummy player to be off the map so that they do not show up in conversation areas
     playerTestData.moveTo(-1, -1);
@@ -373,7 +379,13 @@ describe('Town', () => {
     it('should use the townID and player ID properties when requesting a video token', async () => {
       const newPlayer = mockPlayer(town.townID);
       mockTwilioVideo.getTokenForTown.mockClear();
-      const newPlayerObj = await town.addPlayer(newPlayer.userName, newPlayer.socket);
+      const newPlayerObj = await town.addPlayer(
+        newPlayer.userName,
+        newPlayer.player === undefined
+          ? { avatar: '', aboutMe: '', friendsList: [] }
+          : newPlayer.player?.playerProfile,
+        newPlayer.socket,
+      );
 
       expect(mockTwilioVideo.getTokenForTown).toBeCalledTimes(1);
       expect(mockTwilioVideo.getTokenForTown).toBeCalledWith(town.townID, newPlayerObj.id);
@@ -422,7 +434,13 @@ describe('Town', () => {
           expect(town.addViewingArea(newArea)).toBe(true);
           secondPlayer = mockPlayer(town.townID);
           mockTwilioVideo.getTokenForTown.mockClear();
-          await town.addPlayer(secondPlayer.userName, secondPlayer.socket);
+          await town.addPlayer(
+            secondPlayer.userName,
+            secondPlayer.player === undefined
+              ? { avatar: '', aboutMe: '', friendsList: [] }
+              : secondPlayer.player?.playerProfile,
+            secondPlayer.socket,
+          );
 
           newArea.elapsedTimeSec = 100;
           newArea.isPlaying = false;
@@ -739,7 +757,13 @@ describe('Town', () => {
       });
       it('Adds a player to a new interactable and sets their conversation label, if they move into it', async () => {
         const newPlayer = mockPlayer(town.townID);
-        const newPlayerObj = await town.addPlayer(newPlayer.userName, newPlayer.socket);
+        const newPlayerObj = await town.addPlayer(
+          newPlayer.userName,
+          newPlayer.player === undefined
+            ? { avatar: '', aboutMe: '', friendsList: [] }
+            : newPlayer.player?.playerProfile,
+          newPlayer.socket,
+        );
         newPlayer.moveTo(51, 121);
 
         // Check that the player's location was updated
