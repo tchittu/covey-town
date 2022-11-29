@@ -43,9 +43,9 @@ export default class Player {
     this._sessionToken = nanoid();
     const playerProfile = new PlayerProfile('temp_username', 'temp_pass');
     if (playerProfileModel !== undefined) {
-    playerProfile.avatar = playerProfileModel.avatar;
-    playerProfile.aboutMe = playerProfileModel.aboutMe;
-    playerProfile.friendsList = playerProfileModel.friendsList;
+      playerProfile.avatar = playerProfileModel.avatar;
+      playerProfile.aboutMe = playerProfileModel.aboutMe;
+      playerProfile.friendsList = playerProfileModel.friendsList;
     }
     this._playerProfile = playerProfile;
     this.townEmitter = townEmitter;
