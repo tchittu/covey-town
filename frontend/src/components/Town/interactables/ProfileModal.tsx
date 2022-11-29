@@ -59,12 +59,12 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
 
   useEffect(() => {
     setIsFriend(props.self.profile.friendsList.some(x => x === props.openPlayer?.userName));
-  });
+  }, [props.openPlayer?.userName, props.self.profile.friendsList]);
 
   const closeModal = useCallback(() => {
     coveyTownController.unPause();
     props.handleClick();
-  }, [coveyTownController, props.handleClick]);
+  }, [coveyTownController, props]);
 
   return (
     <Modal
@@ -236,19 +236,20 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                     bg: 'blue.500',
                   }}
                   onClick={async () => {
+                    const propsOpenPlayer = props.openPlayer;
+                    let tempUserName = '';
+                    if (propsOpenPlayer !== undefined) {
+                      tempUserName = propsOpenPlayer.userName;
+                    }
                     if (isFriend) {
                       props.updateData(
                         props.self.profile.avatar,
                         props.self.profile.aboutMe,
-                        props.self.profile.friendsList.filter(
-                          x => x !== props.openPlayer!.userName,
-                        ),
+                        props.self.profile.friendsList.filter(x => x !== tempUserName),
                       );
                       const profile = {
                         username: props.self.userName,
-                        friendsList: props.self.profile.friendsList.filter(
-                          x => x !== props.openPlayer!.userName,
-                        ),
+                        friendsList: props.self.profile.friendsList.filter(x => x !== tempUserName),
                       };
                       await axios
                         .post('http://localhost:8081/profiles/addFriend', profile)
@@ -262,8 +263,8 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                       props.handleClick();
                     } else {
                       const newFriendsList = props.self.profile.friendsList;
-                      if (newFriendsList.findIndex(x => x === props.openPlayer!.userName) == -1) {
-                        newFriendsList.push(props.openPlayer!.userName);
+                      if (newFriendsList.findIndex(x => x === tempUserName) == -1) {
+                        newFriendsList.push(tempUserName);
                       }
                       props.updateData(
                         props.self.profile.avatar,
