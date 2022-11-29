@@ -12,7 +12,9 @@ import useTownController from '../hooks/useTownController';
 import {
   ChatMessage,
   CoveyTownSocket,
+  DirectMessage,
   PlayerLocation,
+  PlayerProfile,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
@@ -25,6 +27,7 @@ const CALCULATE_NEARBY_PLAYERS_DELAY = 300;
 
 export type ConnectionProperties = {
   userName: string;
+  playerProfile: PlayerProfile;
   townID: string;
   loginController: LoginController;
 };
@@ -73,6 +76,11 @@ export type TownEvents = {
    * An event that indicates that a new chat message has been received, which is the parameter passed to the listener
    */
   chatMessage: (message: ChatMessage) => void;
+
+  /**
+   * An event that indicates that a new direct message has been received, which is the parameter passed to the listener
+   */
+  directMessage: ({ message, toPlayer }: DirectMessage) => void;
   /**
    * An event that indicates that the 2D game is now paused. Pausing the game should, if nothing else,
    * release all key listeners, so that text entry is possible
@@ -154,6 +162,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   private readonly _userName: string;
 
+  private _playerProfile: PlayerProfile;
+
   /**
    * The user ID of the player whose browser created this TownController. The user ID is set by the backend townsService, and
    * is only available after the service is connected.
@@ -190,10 +200,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   private _viewingAreas: ViewingAreaController[] = [];
 
-  public constructor({ userName, townID, loginController }: ConnectionProperties) {
+  public constructor({ userName, playerProfile, townID, loginController }: ConnectionProperties) {
     super();
     this._townID = townID;
     this._userName = userName;
+    this._playerProfile = playerProfile;
     this._loginController = loginController;
 
     /*
@@ -205,7 +216,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
     const url = process.env.REACT_APP_TOWNS_SERVICE_URL;
     assert(url);
-    this._socket = io(url, { auth: { userName, townID } });
+    this._socket = io(url, { auth: { userName, townID, playerProfile } });
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
     this.registerSocketListeners();
   }
@@ -335,6 +346,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._socket.on('chatMessage', message => {
       this.emit('chatMessage', message);
     });
+
+    /**
+     * On direct messages, forward the messages to listeners who subscribe to the controller's events
+     */
+    this._socket.on('directMessage', ({ message, toPlayer }) => {
+      this.emit('directMessage', { message, toPlayer });
+    });
     /**
      * On changes to town settings, update the local state and emit a townSettingsUpdated event to
      * the controller's event listeners
@@ -429,6 +447,20 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         updatedViewingArea?.updateFrom(interactable);
       }
     });
+
+    this._socket.on('playerUpdated', updatedPlayer => {
+      const playerToUpdate = this.players.find(eachPlayer => eachPlayer.id === updatedPlayer.id);
+      if (playerToUpdate) {
+        playerToUpdate.profile = updatedPlayer.profile;
+      }
+    });
+  }
+
+  public emitPlayerUpdate(newPlayerProfile: PlayerProfile) {
+    this._socket.emit('playerUpdate', newPlayerProfile);
+    const ourPlayer = this._ourPlayer;
+    assert(ourPlayer);
+    ourPlayer.profile = newPlayerProfile;
   }
 
   /**
@@ -455,6 +487,16 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public emitChatMessage(message: ChatMessage) {
     this._socket.emit('chatMessage', message);
+  }
+
+  /**
+   * Emit a direct message to the townService
+   *
+   * @param message
+   * @param toPlayer
+   */
+  public emitDirectMessage({ message, toPlayer }: DirectMessage) {
+    this._socket.emit('directMessage', { message, toPlayer });
   }
 
   /**

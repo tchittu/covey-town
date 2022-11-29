@@ -1,22 +1,10 @@
-import Player from './Player';
+import axios from 'axios';
+import { ChatMessage, PlayerProfile as PlayerProfileModel } from '../types/CoveyTownSocket';
+
+const DEFAULT_AVATAR = 'DefaultAvatar.png';
 
 export default class PlayerProfile {
-  private readonly _id: string = ''; // this should probably match the id in the Player class?
-
-  public get id() {
-    return this._id;
-  }
-
-  private _player: Player;
-
-  public get player() {
-    return this._player;
-  }
-
-  public set player(newPlayer: Player) {
-    this._player = newPlayer;
-  }
-
+  /** The username of the player which matches the username field of the corresponding Player object */
   private _username: string;
 
   public get username() {
@@ -27,6 +15,7 @@ export default class PlayerProfile {
     this._username = newUsername;
   }
 
+  /** The password that a player needs to enter to log in to this profile */
   private _password: string;
 
   public get password() {
@@ -37,7 +26,10 @@ export default class PlayerProfile {
     this._password = newPassword;
   }
 
-  private _avatar = ''; // set to some default image
+  /** The avatar that appears on this player's profile. It is initially set to a default image
+   * but can be changed by the user.
+   */
+  private _avatar = DEFAULT_AVATAR;
 
   public get avatar() {
     return this._avatar;
@@ -47,6 +39,7 @@ export default class PlayerProfile {
     this._avatar = newAvatar;
   }
 
+  /** Information about this player that will be displayed to other players */
   private _aboutMe = '';
 
   public get aboutMe() {
@@ -57,27 +50,90 @@ export default class PlayerProfile {
     this._aboutMe = newAboutMe;
   }
 
-  private _friendsList: PlayerProfile[] = [];
+  /** A list of usernames of players that are friends with this player */
+  private _friendsList: string[] = [];
 
   public get friendsList() {
     return this._friendsList;
   }
 
-  public set friendsList(newList: PlayerProfile[]) {
+  public set friendsList(newList: string[]) {
     this._friendsList = newList;
   }
 
-  constructor(player: Player, password: string) {
-    this._player = player;
-    this._username = player.userName;
+  /** A list of the messages received by this player's friends */
+  private _inbox: ChatMessage[] = [];
+
+  public get inbox() {
+    return this._inbox;
+  }
+
+  public set inbox(newList: ChatMessage[]) {
+    this._inbox = newList;
+  }
+
+  constructor(userName: string, password: string) {
+    this._username = userName;
     this._password = password;
   }
 
-  public addFriend(friend: PlayerProfile) {
-    this._friendsList.push(friend);
+  /** Adds the given friend to this player's friend list if they are not already there and if the
+   * given player is not this player. If the given player profile is already in the friend list or
+   * if the given player profile is this player, nothing happens.
+   */
+  public addFriend(friend: PlayerProfile): void {
+    const alreadyFriend = this.friendsList.find(name => name === friend.username);
+    const isThisPlayer = this.username === friend.username;
+    if (!alreadyFriend && !isThisPlayer) {
+      this._friendsList.push(friend.username);
+    }
   }
 
-  public removeFriend(friend: PlayerProfile) {
-    this._friendsList.filter(player => player.id !== friend.id);
+  /** Removes the given friend from this player's friend list if it is in the list. If the given player
+   * is not in the friend list, nothing happens.
+   */
+  public removeFriend(friend: PlayerProfile): void {
+    this.friendsList = this.friendsList.filter(name => name !== friend.username);
+
+    this._updateProfileInDB();
+  }
+
+  /** Adds the given message to this player's inbox. */
+  public receiveMessage(message: ChatMessage) {
+    this._inbox.push(message);
+  }
+
+  /**
+   * Takes the current parameters of the player profile and returns it as a single
+   * object to be used to send to the database as JSON.
+   * @returns an object containing all the parametes of a player profile
+   */
+  private _toJSONObj(): object {
+    const jsonObj = {
+      username: this.username,
+      password: this.password,
+      avatar: this._avatar,
+      aboutMe: this._aboutMe,
+      friendsList: this.friendsList,
+    };
+    return jsonObj;
+  }
+
+  /**
+   * API request using axios to send the updated player profile information to our
+   * database and update based on the profile username
+   */
+  private async _updateProfileInDB(): Promise<void> {
+    await axios.put('http://localhost:8081/profiles/update:username', this._toJSONObj());
+
+  }
+
+  public toProfileModel(): PlayerProfileModel {
+    return {
+      avatar: this._avatar,
+      aboutMe: this._aboutMe,
+      friendsList: this._friendsList,
+      inbox: this._inbox,
+    };
   }
 }

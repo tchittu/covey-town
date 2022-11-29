@@ -14,6 +14,7 @@ import {
   CoveyTownSocket,
   Player as PlayerModel,
   PlayerLocation,
+  PlayerProfile as PlayerProfileModel,
   ServerToClientEvents,
   TownJoinResponse,
 } from '../types/CoveyTownSocket';
@@ -84,7 +85,17 @@ describe('TownController', () => {
     mockClear(mockSocket);
     userName = nanoid();
     townID = nanoid();
-    testController = new TownController({ userName, townID, loginController: mockLoginController });
+    const playerProfile: PlayerProfileModel = {
+      avatar: '',
+      aboutMe: '',
+      friendsList: [],
+    };
+    testController = new TownController({
+      userName,
+      playerProfile,
+      townID,
+      loginController: mockLoginController,
+    });
   });
   describe('With an unsuccesful connection', () => {
     it('Throws an error', async () => {
@@ -414,6 +425,7 @@ describe('TownController', () => {
         id: nanoid(),
         location: { moving: false, rotation: 'back', x: 0, y: 1, interactableID: nanoid() },
         userName: nanoid(),
+        profile: { avatar: 'default', aboutMe: 'default', friendsList: [] },
       };
       //Add that player to the test town
       testPlayerPlayersChangedFn = emitEventAndExpectListenerFiring(

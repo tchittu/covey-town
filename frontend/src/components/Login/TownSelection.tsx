@@ -1,5 +1,3 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import assert from 'assert';
 import {
   Box,
   Button,
@@ -19,13 +17,18 @@ import {
   Tr,
   useToast,
 } from '@chakra-ui/react';
+import assert from 'assert';
+import axios, { AxiosError } from 'axios';
+import React, { useCallback, useEffect, useState } from 'react';
+import TownController from '../../classes/TownController';
 import { Town } from '../../generated/client';
 import useLoginController from '../../hooks/useLoginController';
-import TownController from '../../classes/TownController';
+import { PlayerProfile } from '../../types/CoveyTownSocket';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 
 export default function TownSelection(): JSX.Element {
   const [userName, setUserName] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [newTownName, setNewTownName] = useState<string>('');
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);
   const [townIDToJoin, setTownIDToJoin] = useState<string>('');
@@ -60,6 +63,14 @@ export default function TownSelection(): JSX.Element {
           });
           return;
         }
+        if (!password || password.length === 0) {
+          toast({
+            title: 'Unable to join town',
+            description: 'Please select a password',
+            status: 'error',
+          });
+          return;
+        }
         if (!coveyRoomID || coveyRoomID.length === 0) {
           toast({
             title: 'Unable to join town',
@@ -68,8 +79,24 @@ export default function TownSelection(): JSX.Element {
           });
           return;
         }
+
+        const profile = {
+          username: userName,
+          password: password,
+          avatar: '',
+          aboutMe: '',
+          friendsList: [],
+        };
+        await axios.post('http://localhost:4000/profiles/retrieveOrAdd', profile);
+
+        const playerProfile: PlayerProfile = {
+          avatar: '',
+          aboutMe: '',
+          friendsList: [],
+        };
         const newController = new TownController({
           userName,
+          playerProfile,
           townID: coveyRoomID,
           loginController,
         });
@@ -79,9 +106,15 @@ export default function TownSelection(): JSX.Element {
         await videoConnect(videoToken);
         setTownController(newController);
       } catch (err) {
-        if (err instanceof Error) {
+        if (err instanceof AxiosError) {
           toast({
-            title: 'Unable to connect to Towns Service',
+            title: 'Error 1',
+            description: err.response?.data,
+            status: 'error',
+          });
+        } else if (err instanceof Error) {
+          toast({
+            title: 'Unable to connect to Towns Service 1',
             description: err.toString(),
             status: 'error',
           });
@@ -94,7 +127,7 @@ export default function TownSelection(): JSX.Element {
         }
       }
     },
-    [setTownController, userName, toast, videoConnect, loginController],
+    [userName, password, loginController, videoConnect, setTownController, toast],
   );
 
   const handleCreate = async () => {
@@ -102,6 +135,14 @@ export default function TownSelection(): JSX.Element {
       toast({
         title: 'Unable to create town',
         description: 'Please select a username before creating a town',
+        status: 'error',
+      });
+      return;
+    }
+    if (!password || password.length === 0) {
+      toast({
+        title: 'Unable to create town',
+        description: 'Please select a password before creating a town',
         status: 'error',
       });
       return;
@@ -115,6 +156,14 @@ export default function TownSelection(): JSX.Element {
       return;
     }
     try {
+      const profile = {
+        username: userName,
+        password: password,
+        avatar: '',
+        aboutMe: '',
+        friendsList: [],
+      };
+      await axios.post('http://localhost:8081/profiles/retrieveOrAdd', profile);
       const newTownInfo = await townsService.createTown({
         friendlyName: newTownName,
         isPubliclyListed: newTownIsPublic,
@@ -145,9 +194,15 @@ export default function TownSelection(): JSX.Element {
       });
       await handleJoin(newTownInfo.townID);
     } catch (err) {
-      if (err instanceof Error) {
+      if (err instanceof AxiosError) {
         toast({
-          title: 'Unable to connect to Towns Service',
+          title: 'Error 2',
+          description: err.response?.data,
+          status: 'error',
+        });
+      } else if (err instanceof Error) {
+        toast({
+          title: 'Unable to connect to Towns Service 2',
           description: err.toString(),
           status: 'error',
         });
@@ -178,6 +233,22 @@ export default function TownSelection(): JSX.Element {
                 placeholder='Your name'
                 value={userName}
                 onChange={event => setUserName(event.target.value)}
+              />
+            </FormControl>
+          </Box>
+          <Box p='4' borderWidth='1px' borderRadius='lg'>
+            <Heading as='h2' size='lg'>
+              Select a password
+            </Heading>
+
+            <FormControl>
+              <FormLabel htmlFor='name'>Password</FormLabel>
+              <Input
+                autoFocus
+                name='password'
+                placeholder='Your password'
+                value={password}
+                onChange={event => setPassword(event.target.value)}
               />
             </FormControl>
           </Box>

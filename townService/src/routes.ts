@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, Router } from 'express';
 
 // This will help us connect to the database
 import * as dbo from './conn';
@@ -6,10 +6,10 @@ import * as dbo from './conn';
 // profileRoutes is an instance of the express router.
 // We use it to define our routes.
 // The router will be added as a middleware and will take control of requests starting with path /record.
-const profileRoutes = express.Router();
+const profileRoutes: Router = express.Router();
 
 // This section will help you get a list of all the profiles.
-profileRoutes.route('/profiles').get((_req: any, res: any) => {
+profileRoutes.route('/profiles').get((_req: Request, res: Response) => {
   const dbConnect = dbo.getDb();
   dbConnect
     .collection('profiles')
@@ -21,7 +21,7 @@ profileRoutes.route('/profiles').get((_req: any, res: any) => {
 });
 
 // This section will help you get a single profile by username
-profileRoutes.route('/profiles/:username').get((req: any, res: any) => {
+profileRoutes.route('/profiles/:username').get((req: Request, res: Response) => {
   const dbConnect = dbo.getDb();
   const myquery = { username: req.params.username };
   dbConnect.collection('profiles').findOne(myquery, (err: any, result: any) => {
@@ -31,7 +31,7 @@ profileRoutes.route('/profiles/:username').get((req: any, res: any) => {
 });
 
 // This section will help you create a new profile.
-profileRoutes.route('/profiles/add').post((req: any, response: any) => {
+profileRoutes.route('/profiles/add').post((req: Request, response: Response) => {
   const dbConnect = dbo.getDb();
   const myobj = {
     username: req.body.username,
@@ -47,9 +47,10 @@ profileRoutes.route('/profiles/add').post((req: any, response: any) => {
 });
 
 // Create a profile if it doesn't already exist
-profileRoutes.route('/profiles/retrieveOrAdd').post(async (req: any, response: any) => {
+profileRoutes.route('/profiles/retrieveOrAdd').post(async (req: Request, response: Response) => {
   const dbConnect = dbo.getDb();
 
+  console.log(req.body);
   const result = await dbConnect.collection('profiles').findOne({ username: req.body.username });
 
   if (result) {
@@ -76,7 +77,7 @@ profileRoutes.route('/profiles/retrieveOrAdd').post(async (req: any, response: a
 });
 
 // This section will help you update a profile by username.
-profileRoutes.route('/profiles/update').post(async (req: any, response: any) => {
+profileRoutes.route('/profiles/update').post(async (req: Request, response: Response) => {
   const dbConnect = dbo.getDb();
   const myquery = { username: req.body.username };
   const newvalues = {
@@ -94,7 +95,7 @@ profileRoutes.route('/profiles/update').post(async (req: any, response: any) => 
 });
 
 // This section will help you delete a profile
-profileRoutes.route('/:username').delete((req: any, response: any) => {
+profileRoutes.route('/:username').delete((req: Request, response: Response) => {
   const dbConnect = dbo.getDb();
   const myquery = { _username: req.params.username };
   dbConnect.collection('profiles').deleteOne(myquery, (err: any, obj: any) => {
@@ -104,4 +105,4 @@ profileRoutes.route('/:username').delete((req: any, response: any) => {
   });
 });
 
-export default { profileRoutes };
+export default profileRoutes;

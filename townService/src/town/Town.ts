@@ -9,8 +9,10 @@ import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
   CoveyTownSocket,
+  DirectMessage,
   Interactable,
   PlayerLocation,
+  PlayerProfile,
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
@@ -108,8 +110,12 @@ export default class Town {
    *
    * @param newPlayer The new player to add to the town
    */
-  async addPlayer(userName: string, socket: CoveyTownSocket): Promise<Player> {
-    const newPlayer = new Player(userName, socket.to(this._townID));
+  async addPlayer(
+    userName: string,
+    playerProfile: PlayerProfile,
+    socket: CoveyTownSocket,
+  ): Promise<Player> {
+    const newPlayer = new Player(userName, playerProfile, socket.to(this._townID));
     this._players.push(newPlayer);
 
     this._connectedSockets.add(socket);
@@ -131,6 +137,11 @@ export default class Town {
     // Set up a listener to forward all chat messages to all clients in the town
     socket.on('chatMessage', (message: ChatMessage) => {
       this._broadcastEmitter.emit('chatMessage', message);
+    });
+
+    // Set up a listener to forward all direct messages to all clients in the town
+    socket.on('directMessage', ({ message, toPlayer }) => {
+      this._broadcastEmitter.emit('directMessage', { message, toPlayer });
     });
 
     // Register an event listener for the client socket: if the client updates their
@@ -156,7 +167,16 @@ export default class Town {
         }
       }
     });
+
+    socket.on('playerUpdate', (newPlayerProfile: PlayerProfile) => {
+      this._updatePlayer(newPlayer, newPlayerProfile);
+    });
     return newPlayer;
+  }
+
+  private _updatePlayer(player: Player, playerProfile: PlayerProfile): void {
+    player.updateProfile(playerProfile);
+    this._broadcastEmitter.emit('playerUpdated', player.toPlayerModel());
   }
 
   /**

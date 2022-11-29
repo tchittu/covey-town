@@ -152,6 +152,7 @@ export async function mockTownControllerConnection(
           id: ourUserID,
           userName: testController.userName,
           location: { moving: false, x: 0, y: 0, rotation: 'back' },
+          profile: { avatar: 'default', aboutMe: 'default', friendsList: [] },
         },
       ],
       friendlyName: nanoid(),
@@ -171,6 +172,7 @@ export async function mockTownControllerConnection(
         id: playerID,
         userName: nanoid(),
         location: { moving: false, x: 0, y: 0, rotation: 'back' },
+        profile: { avatar: 'default', aboutMe: 'default', friendsList: [] },
       });
       responseToSendController.interactables.push({
         id: nanoid(),
