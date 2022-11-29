@@ -7,6 +7,7 @@ import swaggerUi from 'swagger-ui-express';
 import { ValidateError } from 'tsoa';
 import fs from 'fs/promises';
 import { Server as SocketServer } from 'socket.io';
+import bodyParser from 'body-parser';
 import profileRoutes from './routes';
 import * as dbo from './conn';
 import { RegisterRoutes } from '../generated/routes';
@@ -14,7 +15,6 @@ import TownsStore from './lib/TownsStore';
 import { ClientToServerEvents, ServerToClientEvents } from './types/CoveyTownSocket';
 import { TownsController } from './town/TownsController';
 import { logError } from './Utils';
-import bodyParser from 'body-parser';
 
 // Create the server instances
 const app = Express();
@@ -27,7 +27,7 @@ const socketServer = new SocketServer<ClientToServerEvents, ServerToClientEvents
 });
 
 dot.config({ path: './.env' });
-//const { PORT } = process.env;
+// const { PORT } = process.env;
 app.use(profileRoutes);
 // get driver connection
 
