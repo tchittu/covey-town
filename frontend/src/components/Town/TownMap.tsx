@@ -92,7 +92,7 @@ export default function TownMap(): JSX.Element {
       coveyTownController.removeListener('directMessage', receiveMessage);
       game.destroy(true);
     };
-  }, [coveyTownController, openPlayer, updateData]);
+  }, [coveyTownController]);
 
   return isSelf ? (
     <div id='app-container'>

@@ -84,6 +84,24 @@ profileRoutes.route('/profiles/update').post(async (req: Request, response: Resp
     $set: {
       avatar: req.body.avatar,
       aboutMe: req.body.aboutMe,
+      friendsList: req.body.friendsList,
+    },
+  };
+  dbConnect.collection('profiles').updateOne(myquery, newvalues, (err: any, res: any) => {
+    if (err) throw err;
+    console.log(`${res.matchedCount} document(s) matched the query criteria.`);
+    console.log(`${res.modifiedCount} document(s) was/were updated.`);
+    response.json(res);
+  });
+});
+
+// Update friends list
+profileRoutes.route('/profiles/addFriend').post(async (req: Request, response: Response) => {
+  const dbConnect = dbo.getDb();
+  const myquery = { username: req.body.username };
+  const newvalues = {
+    $set: {
+      friendsList: req.body.friendsList,
     },
   };
   dbConnect.collection('profiles').updateOne(myquery, newvalues, (err: any, res: any) => {
