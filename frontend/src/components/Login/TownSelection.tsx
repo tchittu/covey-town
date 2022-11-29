@@ -87,7 +87,7 @@ export default function TownSelection(): JSX.Element {
           aboutMe: '',
           friendsList: [],
         };
-        await axios.post('http://localhost:4000/profiles/retrieveOrAdd', profile);
+        await axios.post('http://localhost:8081/profiles/retrieveOrAdd', profile);
 
         const playerProfile: PlayerProfile = {
           avatar: '',

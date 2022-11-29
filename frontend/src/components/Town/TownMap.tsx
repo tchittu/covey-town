@@ -79,7 +79,7 @@ export default function TownMap(): JSX.Element {
   ) : (
     <div id='app-container'>
       <NewConversationModal />
-      <ProfileModal open={openProfile} openPlayer={openPlayer} handleClick={handleClose} />
+      <ProfileModal self={coveyTownController.ourPlayer} open={openProfile} openPlayer={openPlayer} handleClick={handleClose} updateData={updateData} />
       <div id='map-container' />
       <SocialSidebar />
     </div>
