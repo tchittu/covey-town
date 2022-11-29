@@ -21,10 +21,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
-      # Start database
-      - name: Connect to database
-        run: cd database; npm install express
-
       - name: Build and test backend service
         env: # Pass the Twilio secrets into environmental variables for the backend tests to use
           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}

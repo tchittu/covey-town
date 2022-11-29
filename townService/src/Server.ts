@@ -1,4 +1,8 @@
 import Express from 'express';
+import express from 'express';
+import * as dbo from './conn';
+import * as dot from 'dotenv';
+import * as route from './routes';
 import * as http from 'http';
 import CORS from 'cors';
 import { AddressInfo } from 'net';
@@ -19,6 +23,12 @@ const server = http.createServer(app);
 const socketServer = new SocketServer<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: { origin: '*' },
 });
+
+dot.config({ path: "./.env" });
+const port = process.env.PORT;
+app.use(express.json());
+//app.use('./routes');
+// get driver connection
 
 // Initialize the towns store with a factory that creates a broadcast emitter for a town
 TownsStore.initializeTownsStore((townID: string) => socketServer.to(townID));
@@ -68,6 +78,11 @@ app.use(
 
 // Start the configured server, defaulting to port 8081 if $PORT is not set
 server.listen(process.env.PORT || 8081, () => {
+  dbo.connectToServer(function (err: any) {
+    if (err) console.error(err);
+  });
+  console.log(`Server is running on port: ${port}`);
+
   const address = server.address() as AddressInfo;
   // eslint-disable-next-line no-console
   console.log(`Listening on ${address.port}`);

@@ -1,10 +1,10 @@
-const { MongoClient } = require("mongodb");
+import { MongoClient } from "mongodb";
 
 const url =
   "mongodb+srv://covey_town_user:cs4530@cluster0.bpcqjvf.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(url);
 
-async function createProfile(client, newProfile) {
+async function createProfile(client: any, newProfile: any) {
   const result = await client
     .db("CoveyTown")
     .collection("profiles")
@@ -14,7 +14,7 @@ async function createProfile(client, newProfile) {
   );
 }
 
-async function findOneProfileByUsername(client, username) {
+async function findOneProfileByUsername(client: any, username: any) {
   const result = await client
     .db("CoveyTown")
     .collection("profiles")
@@ -31,7 +31,7 @@ async function findOneProfileByUsername(client, username) {
   }
 }
 
-async function updateProfileByUsername(client, username, updatedProfile) {
+async function updateProfileByUsername(client: any, username: any, updatedProfile: any) {
   const result = await client
     .db("CoveyTown")
     .collection("profiles")
@@ -66,7 +66,7 @@ async function run() {
     });
 
     console.log("Connected correctly to server");
-  } catch (err) {
+  } catch (err: any) {
     console.log(err.stack);
   } finally {
     await client.close();

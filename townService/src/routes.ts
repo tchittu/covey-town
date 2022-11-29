@@ -9,29 +9,29 @@ const profileRoutes = express.Router();
 const dbo = require("./conn");
 
 // This section will help you get a list of all the profiles.
-profileRoutes.route("/profiles").get(function (req, res) {
+profileRoutes.route("/profiles").get(function (_req: any, res: any) {
   let db_connect = dbo.getDb();
   db_connect
     .collection("profiles")
     .find({})
-    .toArray(function (err, result) {
+    .toArray(function (err: any, result: any) {
       if (err) throw err;
       res.json(result);
     });
 });
 
 // This section will help you get a single profile by username
-profileRoutes.route("/profiles/:username").get(function (req, res) {
+profileRoutes.route("/profiles/:username").get(function (req: any, res: any) {
   let db_connect = dbo.getDb();
   let myquery = { username: req.params.username };
-  db_connect.collection("profiles").findOne(myquery, function (err, result) {
+  db_connect.collection("profiles").findOne(myquery, function (err: any, result: any) {
     if (err) throw err;
     res.json(result);
   });
 });
 
 // This section will help you create a new profile.
-profileRoutes.route("/profiles/add").post(function (req, response) {
+profileRoutes.route("/profiles/add").post(function (req: any, response: any) {
   let db_connect = dbo.getDb();
   let myobj = {
     username: req.body.username,
@@ -40,7 +40,7 @@ profileRoutes.route("/profiles/add").post(function (req, response) {
     aboutMe: req.body.aboutMe,
     friendsList: req.body.friendsList,
   };
-  db_connect.collection("profiles").insertOne(myobj, function (err, res) {
+  db_connect.collection("profiles").insertOne(myobj, function (err: any, res: any) {
     if (err) throw err;
     response.json(res);
   });
@@ -49,7 +49,7 @@ profileRoutes.route("/profiles/add").post(function (req, response) {
 // Create a profile if it doesn't already exist
 profileRoutes
   .route("/profiles/retrieveOrAdd")
-  .post(async function (req, response) {
+  .post(async function (req: any, response: any) {
     let db_connect = dbo.getDb();
 
     const result = await db_connect
@@ -72,7 +72,7 @@ profileRoutes
         aboutMe: req.body.aboutMe,
         friendsList: req.body.friendsList,
       };
-      db_connect.collection("profiles").insertOne(myobj, function (err, res) {
+      db_connect.collection("profiles").insertOne(myobj, function (err: any, res: any) {
         if (err) throw err;
         response.json(res);
       });
@@ -80,7 +80,7 @@ profileRoutes
   });
 
 // This section will help you update a profile by username.
-profileRoutes.route("/profiles/update").post(async function (req, response) {
+profileRoutes.route("/profiles/update").post(async function (req: any, response: any) {
   let db_connect = dbo.getDb();
   let myquery = { username: req.body.username };
   let newvalues = {
@@ -91,7 +91,7 @@ profileRoutes.route("/profiles/update").post(async function (req, response) {
   };
   db_connect
     .collection("profiles")
-    .updateOne(myquery, newvalues, function (err, res) {
+    .updateOne(myquery, newvalues, function (err: any, res: any) {
       if (err) throw err;
       console.log(
         `${res.matchedCount} document(s) matched the query criteria.`
@@ -102,14 +102,14 @@ profileRoutes.route("/profiles/update").post(async function (req, response) {
 });
 
 // This section will help you delete a profile
-profileRoutes.route("/:username").delete((req, response) => {
+profileRoutes.route("/:username").delete((req: any, response: any) => {
   let db_connect = dbo.getDb();
   let myquery = { _username: req.params.username };
-  db_connect.collection("profiles").deleteOne(myquery, function (err, obj) {
+  db_connect.collection("profiles").deleteOne(myquery, function (err: any, obj: any) {
     if (err) throw err;
     console.log("1 document deleted");
     response.json(obj);
   });
 });
 
-module.exports = profileRoutes;
+export { profileRoutes };
