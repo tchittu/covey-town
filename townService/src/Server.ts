@@ -1,5 +1,5 @@
 import Express from 'express';
-import * as dot from 'dotenv';
+import dot from 'dotenv';
 import * as http from 'http';
 import CORS from 'cors';
 import { AddressInfo } from 'net';
@@ -7,25 +7,28 @@ import swaggerUi from 'swagger-ui-express';
 import { ValidateError } from 'tsoa';
 import fs from 'fs/promises';
 import { Server as SocketServer } from 'socket.io';
-import * as route from './routes';
+import profileRoutes from './routes';
 import * as dbo from './conn';
 import { RegisterRoutes } from '../generated/routes';
 import TownsStore from './lib/TownsStore';
 import { ClientToServerEvents, ServerToClientEvents } from './types/CoveyTownSocket';
 import { TownsController } from './town/TownsController';
 import { logError } from './Utils';
+import bodyParser from 'body-parser';
 
 // Create the server instances
 const app = Express();
 app.use(CORS());
+app.use(bodyParser.urlencoded());
+app.use(bodyParser.json());
 const server = http.createServer(app);
 const socketServer = new SocketServer<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: { origin: '*' },
 });
 
 dot.config({ path: './.env' });
-const { PORT } = process.env;
-// app.use('./routes');
+//const { PORT } = process.env;
+app.use(profileRoutes);
 // get driver connection
 
 // Initialize the towns store with a factory that creates a broadcast emitter for a town
@@ -79,7 +82,7 @@ server.listen(process.env.PORT || 8081, () => {
   dbo.connectToServer((err: any) => {
     if (err) console.error(err);
   });
-  console.log(`Server is running on port: ${PORT}`);
+  console.log(`Server is running on port: ${process.env.PORT}`);
 
   const address = server.address() as AddressInfo;
   // eslint-disable-next-line no-console
