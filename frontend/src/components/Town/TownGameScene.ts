@@ -360,10 +360,10 @@ export default class TownGameScene extends Phaser.Scene {
 
     // Object layers in Tiled let you embed extra info into a map - like a spawn point or custom
     // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
-    const spawnPoint = (this.map.findObject(
+    const spawnPoint = this.map.findObject(
       'Objects',
       obj => obj.name === 'Spawn Point',
-    ) as unknown) as Phaser.GameObjects.Components.Transform;
+    ) as unknown as Phaser.GameObjects.Components.Transform;
 
     const labels = this.map.filterObjects('Objects', obj => obj.name === 'label');
     labels.forEach(label => {
@@ -568,6 +568,7 @@ export default class TownGameScene extends Phaser.Scene {
       }
       this._previouslyCapturedKeys = this.input.keyboard.getCaptures();
       this.input.keyboard.clearCaptures();
+      this.input.mouse.enabled = false;
     }
   }
 
@@ -576,6 +577,9 @@ export default class TownGameScene extends Phaser.Scene {
       this._paused = false;
       if (this.input && this.input.keyboard) {
         this.input.keyboard.addCapture(this._previouslyCapturedKeys);
+      }
+      if (this.input && !this.input.mouse.enabled) {
+        this.input.mouse.enabled = true;
       }
       this._previouslyCapturedKeys = [];
     }

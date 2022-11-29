@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { ChatMessage, PlayerProfile as PlayerProfileModel } from '../types/CoveyTownSocket';
 
-
 const DEFAULT_AVATAR = 'DefaultAvatar.png';
 
 export default class PlayerProfile {

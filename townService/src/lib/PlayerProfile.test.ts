@@ -8,6 +8,14 @@ describe('PlayerProfile', () => {
   const username = 'username';
   const townEmitter = mock<TownEmitter>();
   const password = 'password';
+  const friend1 = {
+    username: 'friend1',
+    avatar: 'friend1',
+  };
+  const friend2 = {
+    username: 'friend2',
+    avatar: 'friend2',
+  };
   let profile: PlayerProfile;
   beforeEach(() => {
     mockClear(townEmitter);
@@ -65,12 +73,12 @@ describe('PlayerProfile', () => {
       expect(profile.friendsList.length).toEqual(0);
     });
     it('returns correct friendsList', () => {
-      profile.friendsList = ['friend1'];
-      expect(profile.friendsList).toEqual(['friend1']);
+      profile.friendsList = [friend1];
+      expect(profile.friendsList).toEqual([friend1]);
     });
     it('sets to given friendsList', () => {
-      profile.friendsList = ['friend1', 'friend2'];
-      expect(profile.friendsList).toEqual(['friend1', 'friend2']);
+      profile.friendsList = [friend1, friend2];
+      expect(profile.friendsList).toEqual([friend1, friend2]);
       expect(profile.friendsList.length).toEqual(2);
     });
   });

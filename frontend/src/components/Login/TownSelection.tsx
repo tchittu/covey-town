@@ -23,7 +23,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import TownController from '../../classes/TownController';
 import { Town } from '../../generated/client';
 import useLoginController from '../../hooks/useLoginController';
-import { ChatMessage, PlayerProfile } from '../../types/CoveyTownSocket';
+import { PlayerProfile } from '../../types/CoveyTownSocket';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 
 export default function TownSelection(): JSX.Element {
@@ -79,10 +79,20 @@ export default function TownSelection(): JSX.Element {
           });
           return;
         }
+
+        const profile = {
+          username: userName,
+          password: password,
+          avatar: '',
+          aboutMe: '',
+          friendsList: [],
+        };
+        await axios.post('http://localhost:4000/profiles/retrieveOrAdd', profile);
+
         const playerProfile: PlayerProfile = {
           avatar: '',
           aboutMe: '',
-          friendsList: ['starter_friend_1', 'starter_friend_2', 'starter_friend_3'],
+          friendsList: [],
         };
         const newController = new TownController({
           userName,
@@ -95,16 +105,6 @@ export default function TownSelection(): JSX.Element {
         assert(videoToken);
         await videoConnect(videoToken);
         setTownController(newController);
-
-        // try adding user to database
-        const profile = {
-          username: userName,
-          password: password,
-          avatar: '',
-          aboutMe: '',
-          friendsList: [],
-        };
-        await axios.post('http://localhost:8081/profiles/retrieveOrAdd', profile);
       } catch (err) {
         if (err instanceof AxiosError) {
           toast({
