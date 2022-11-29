@@ -1,26 +1,24 @@
-import { MongoClient, MongoClientOptions } from "mongodb";
-const db =
-  "mongodb+srv://covey_town_user:cs4530@cluster0.bpcqjvf.mongodb.net/?retryWrites=true&w=majority";
-const client = new MongoClient(db);
+import { MongoClient, MongoClientOptions } from 'mongodb';
 
-var _db: any;
+const DB =
+  'mongodb+srv://covey_town_user:cs4530@cluster0.bpcqjvf.mongodb.net/?retryWrites=true&w=majority';
+const client = new MongoClient(DB);
+
+let db: any;
 
 const connectToServer = async function (_callback: any) {
   try {
     await client.connect();
-    console.log("Connected correctly to server");
+    console.log('Connected correctly to server');
 
-    _db = client.db("CoveyTown");
+    db = client.db('CoveyTown');
   } catch (err: any) {
     console.log(err.stack);
   }
-}
+};
 
 const getDb = function () {
-  return _db;
-}
-
-export {
-  connectToServer,
-  getDb
+  return db;
 };
+
+export { connectToServer, getDb };

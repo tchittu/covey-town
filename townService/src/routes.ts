@@ -1,115 +1,107 @@
-const express = require("express");
+import express from 'express';
+
+// This will help us connect to the database
+import * as dbo from './conn';
 
 // profileRoutes is an instance of the express router.
 // We use it to define our routes.
 // The router will be added as a middleware and will take control of requests starting with path /record.
 const profileRoutes = express.Router();
 
-// This will help us connect to the database
-const dbo = require("./conn");
-
 // This section will help you get a list of all the profiles.
-profileRoutes.route("/profiles").get(function (_req: any, res: any) {
-  let db_connect = dbo.getDb();
-  db_connect
-    .collection("profiles")
+profileRoutes.route('/profiles').get((_req: any, res: any) => {
+  const dbConnect = dbo.getDb();
+  dbConnect
+    .collection('profiles')
     .find({})
-    .toArray(function (err: any, result: any) {
+    .toArray((err: any, result: any) => {
       if (err) throw err;
       res.json(result);
     });
 });
 
 // This section will help you get a single profile by username
-profileRoutes.route("/profiles/:username").get(function (req: any, res: any) {
-  let db_connect = dbo.getDb();
-  let myquery = { username: req.params.username };
-  db_connect.collection("profiles").findOne(myquery, function (err: any, result: any) {
+profileRoutes.route('/profiles/:username').get((req: any, res: any) => {
+  const dbConnect = dbo.getDb();
+  const myquery = { username: req.params.username };
+  dbConnect.collection('profiles').findOne(myquery, (err: any, result: any) => {
     if (err) throw err;
     res.json(result);
   });
 });
 
 // This section will help you create a new profile.
-profileRoutes.route("/profiles/add").post(function (req: any, response: any) {
-  let db_connect = dbo.getDb();
-  let myobj = {
+profileRoutes.route('/profiles/add').post((req: any, response: any) => {
+  const dbConnect = dbo.getDb();
+  const myobj = {
     username: req.body.username,
     password: req.body.password,
     avatar: req.body.avatar,
     aboutMe: req.body.aboutMe,
     friendsList: req.body.friendsList,
   };
-  db_connect.collection("profiles").insertOne(myobj, function (err: any, res: any) {
+  dbConnect.collection('profiles').insertOne(myobj, (err: any, res: any) => {
     if (err) throw err;
     response.json(res);
   });
 });
 
 // Create a profile if it doesn't already exist
-profileRoutes
-  .route("/profiles/retrieveOrAdd")
-  .post(async function (req: any, response: any) {
-    let db_connect = dbo.getDb();
+profileRoutes.route('/profiles/retrieveOrAdd').post(async (req: any, response: any) => {
+  const dbConnect = dbo.getDb();
 
-    const result = await db_connect
-      .collection("profiles")
-      .findOne({ username: req.body.username });
+  const result = await dbConnect.collection('profiles').findOne({ username: req.body.username });
 
-    if (result) {
-      if (result.password === req.body.password) {
-        console.log("Found profile");
-        response.json(result);
-      } else {
-        console.log("Incorrect password");
-        response.status(400).send("Incorrect password");
-      }
+  if (result) {
+    if (result.password === req.body.password) {
+      console.log('Found profile');
+      response.json(result);
     } else {
-      let myobj = {
-        username: req.body.username,
-        password: req.body.password,
-        avatar: req.body.avatar,
-        aboutMe: req.body.aboutMe,
-        friendsList: req.body.friendsList,
-      };
-      db_connect.collection("profiles").insertOne(myobj, function (err: any, res: any) {
-        if (err) throw err;
-        response.json(res);
-      });
+      console.log('Incorrect password');
+      response.status(400).send('Incorrect password');
     }
-  });
+  } else {
+    const myobj = {
+      username: req.body.username,
+      password: req.body.password,
+      avatar: req.body.avatar,
+      aboutMe: req.body.aboutMe,
+      friendsList: req.body.friendsList,
+    };
+    dbConnect.collection('profiles').insertOne(myobj, (err: any, res: any) => {
+      if (err) throw err;
+      response.json(res);
+    });
+  }
+});
 
 // This section will help you update a profile by username.
-profileRoutes.route("/profiles/update").post(async function (req: any, response: any) {
-  let db_connect = dbo.getDb();
-  let myquery = { username: req.body.username };
-  let newvalues = {
+profileRoutes.route('/profiles/update').post(async (req: any, response: any) => {
+  const dbConnect = dbo.getDb();
+  const myquery = { username: req.body.username };
+  const newvalues = {
     $set: {
       avatar: req.body.avatar,
       aboutMe: req.body.aboutMe,
     },
   };
-  db_connect
-    .collection("profiles")
-    .updateOne(myquery, newvalues, function (err: any, res: any) {
-      if (err) throw err;
-      console.log(
-        `${res.matchedCount} document(s) matched the query criteria.`
-      );
-      console.log(`${res.modifiedCount} document(s) was/were updated.`);
-      response.json(res);
-    });
+  dbConnect.collection('profiles').updateOne(myquery, newvalues, (err: any, res: any) => {
+    if (err) throw err;
+    console.log(`${res.matchedCount} document(s) matched the query criteria.`);
+    console.log(`${res.modifiedCount} document(s) was/were updated.`);
+    response.json(res);
+  });
 });
 
 // This section will help you delete a profile
-profileRoutes.route("/:username").delete((req: any, response: any) => {
-  let db_connect = dbo.getDb();
-  let myquery = { _username: req.params.username };
-  db_connect.collection("profiles").deleteOne(myquery, function (err: any, obj: any) {
+profileRoutes.route('/:username').delete((req: any, response: any) => {
+  const dbConnect = dbo.getDb();
+  const myquery = { _username: req.params.username };
+  dbConnect.collection('profiles').deleteOne(myquery, (err: any, obj: any) => {
     if (err) throw err;
-    console.log("1 document deleted");
+    console.log('1 document deleted');
     response.json(obj);
   });
 });
 
-export { profileRoutes };
+export default { profileRoutes };
