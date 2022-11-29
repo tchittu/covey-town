@@ -48,7 +48,6 @@
         "node": "16.x.x"
     },
     "dependencies": {
-        "@chakra-ui/icons": "^2.0.11",
         "@chakra-ui/react": "^2.4.1",
         "@types/ramda": "^0.27.34",
         "cors": "^2.8.5",
