@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import React, { useEffect } from 'react';
+import { DirectMessage } from '../../../../shared/types/CoveyTownSocket';
 import PlayerController from '../../classes/PlayerController';
 import useTownController from '../../hooks/useTownController';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
@@ -57,9 +58,18 @@ export default function TownMap(): JSX.Element {
     const unPauseListener = newGameScene.resume.bind(newGameScene);
     coveyTownController.addListener('pause', pauseListener);
     coveyTownController.addListener('unPause', unPauseListener);
+
+    const receiveMessage = ({ message, toPlayer }: DirectMessage) => {
+      if (coveyTownController.ourPlayer.userName === toPlayer) {
+        coveyTownController.ourPlayer.receiveMessage(message);
+      }
+    };
+    coveyTownController.addListener('directMessage', receiveMessage);
+
     return () => {
       coveyTownController.removeListener('pause', pauseListener);
       coveyTownController.removeListener('unPause', unPauseListener);
+      coveyTownController.removeListener('directMessage', receiveMessage);
       game.destroy(true);
     };
   }, [coveyTownController]);
@@ -79,7 +89,13 @@ export default function TownMap(): JSX.Element {
   ) : (
     <div id='app-container'>
       <NewConversationModal />
-      <ProfileModal self={coveyTownController.ourPlayer} open={openProfile} openPlayer={openPlayer} handleClick={handleClose} updateData={updateData} />
+      <ProfileModal
+        self={coveyTownController.ourPlayer}
+        open={openProfile}
+        openPlayer={openPlayer}
+        handleClick={handleClose}
+        updateData={updateData}
+      />
       <div id='map-container' />
       <SocialSidebar />
     </div>

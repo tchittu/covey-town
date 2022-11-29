@@ -150,7 +150,6 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                                 hidden={isHidden}
                                 aria-label='Add to friends'
                                 size='xs'
-                                
                                 onClick={async () => {
                                   coveyTownController.ourPlayer.profile.friendsList.push(friend);
                                   props.updateData(
@@ -187,7 +186,7 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
             </Box>
 
             <Stack mt={8} direction={'column'} spacing={4}>
-            <FormControl id='message' isRequired={false}>
+              <FormControl id='message' isRequired={false}>
                 <FormLabel>Message</FormLabel>
                 <Textarea
                   placeholder='message'
@@ -291,7 +290,6 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                 </Button>
               </Stack>
             </Stack>
-            
           </Box>
         </Center>
       </ModalContent>
