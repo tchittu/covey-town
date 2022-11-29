@@ -27,6 +27,21 @@ export default function TownMap(): JSX.Element {
     [coveyTownController],
   );
 
+  const getDBProfile = async () => {
+    await axios
+      .get('http://localhost:8081/profiles/' + coveyTownController.ourPlayer.userName)
+      .then(res => {
+        updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    getDBProfile();
+  });
+
   useEffect(() => {
     const config = {
       type: Phaser.AUTO,
@@ -63,19 +78,6 @@ export default function TownMap(): JSX.Element {
     coveyTownController.addListener('pause', pauseListener);
     coveyTownController.addListener('unPause', unPauseListener);
 
-    const getDBProfile = async () => {
-      await axios
-        .get('http://localhost:8081/profiles/' + coveyTownController.ourPlayer.userName)
-        .then(res => {
-          updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    };
-
-    getDBProfile();
-
     const receiveMessage = ({ message, toPlayer }: DirectMessage) => {
       const userName = coveyTownController.ourPlayer.userName;
       if (userName === toPlayer) {
@@ -86,7 +88,6 @@ export default function TownMap(): JSX.Element {
     coveyTownController.addListener('directMessage', receiveMessage);
 
     return () => {
-      console.log(openPlayer);
       coveyTownController.removeListener('pause', pauseListener);
       coveyTownController.removeListener('unPause', unPauseListener);
       coveyTownController.removeListener('directMessage', receiveMessage);
