@@ -90,17 +90,21 @@ export interface ServerToClientEvents {
   townSettingsUpdated: (update: TownSettingsUpdate) => void;
   townClosing: () => void;
   chatMessage: (message: ChatMessage) => void;
-  directMessage: ({message, toPlayer}: DirectMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
   playerUpdated: (updatedPlayer: Player) => void;
-  directMessage: ({message: ChatMessage, toPlayer: string}: DirectMessage) => void;
+  directMessage: ({
+    message: ChatMessage,
+    toPlayer: string,
+  }: DirectMessage) => void;
 }
 
 export interface ClientToServerEvents {
   chatMessage: (message: ChatMessage) => void;
-  directMessage: ({message, toPlayer}: DirectMessage) => void;
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
   playerUpdate: (newPlayerProfile: PlayerProfile) => void;
-  directMessage: ({message: ChatMessage, toPlayer: string}: DirectMessage) => void;
+  directMessage: ({
+    message: ChatMessage,
+    toPlayer: string,
+  }: DirectMessage) => void;
 }

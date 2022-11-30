@@ -463,8 +463,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   /**
    * Emit a playerUpdate event for the current player, updating our profile locally and
    * also notifying the backend that our player's profile changed.
-   * 
-   * @param newPlayerProfile 
+   *
+   * @param newPlayerProfile
    */
   public emitPlayerUpdate(newPlayerProfile: PlayerProfile) {
     this._socket.emit('playerUpdate', newPlayerProfile);
