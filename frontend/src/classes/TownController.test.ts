@@ -145,6 +145,19 @@ describe('TownController', () => {
       };
       emitEventAndExpectListenerFiring('chatMessage', message, 'chatMessage', message);
     });
+    it('Forwards direct messages to local CoveyTownEvents listeners', () => {
+      const message: ChatMessage = {
+        author: nanoid(),
+        body: nanoid(),
+        dateCreated: new Date(),
+        sid: nanoid(),
+      };
+      const toPlayer = 'player1';
+      emitEventAndExpectListenerFiring('directMessage', { message, toPlayer }, 'directMessage', {
+        message,
+        toPlayer,
+      });
+    });
     it("Emits the local player's movement updates to the socket and to locally subscribed CoveyTownEvents listeners", () => {
       const newLocation: PlayerLocation = { ...testController.ourPlayer.location, x: 10, y: 10 };
       const expectedPlayerUpdate = testController.ourPlayer;
@@ -174,6 +187,18 @@ describe('TownController', () => {
       testController.emitChatMessage(testMessage);
 
       expect(mockSocket.emit).toBeCalledWith('chatMessage', testMessage);
+    });
+    it('Emits locally written direct messages to the socket, and dispatches no other events', () => {
+      const testMessage: ChatMessage = {
+        author: nanoid(),
+        body: nanoid(),
+        dateCreated: new Date(),
+        sid: nanoid(),
+      };
+      const toPlayer = 'player1';
+      testController.emitDirectMessage({ message: testMessage, toPlayer });
+
+      expect(mockSocket.emit).toBeCalledWith('directMessage', { testMessage, toPlayer });
     });
     it('Emits conversationAreasChanged when a conversation area is created', () => {
       const newConvArea = townJoinResponse.interactables.find(
