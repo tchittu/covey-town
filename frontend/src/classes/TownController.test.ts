@@ -200,6 +200,36 @@ describe('TownController', () => {
 
       expect(mockSocket.emit).toBeCalledWith('directMessage', { message, toPlayer });
     });
+    it('Emits playerUpdated events when player avatar changes', async () => {
+      const newProfile = {
+        avatar: 'changed',
+        aboutMe: 'default',
+        friendsList: [],
+      };
+      testController.emitPlayerUpdate(newProfile);
+
+      expect(mockSocket.emit).toBeCalledWith('playerUpdate', newProfile);
+    });
+    it('Emits playerUpdated events when player aboutMe changes', async () => {
+      const newProfile = {
+        avatar: 'default',
+        aboutMe: 'changed',
+        friendsList: [],
+      };
+      testController.emitPlayerUpdate(newProfile);
+
+      expect(mockSocket.emit).toBeCalledWith('playerUpdate', newProfile);
+    });
+    it('Emits playerUpdated events when player friendsList changes', async () => {
+      const newProfile = {
+        avatar: 'default',
+        aboutMe: 'default',
+        friendsList: ['1', '2', '3'],
+      };
+      testController.emitPlayerUpdate(newProfile);
+
+      expect(mockSocket.emit).toBeCalledWith('playerUpdate', newProfile);
+    });
     it('Emits conversationAreasChanged when a conversation area is created', () => {
       const newConvArea = townJoinResponse.interactables.find(
         eachInteractable => isConversationArea(eachInteractable) && !eachInteractable.topic,
