@@ -49,18 +49,22 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
   const [aboutMe, setAboutMe] = useState('');
   const [friendsList, setFriendsList] = useState(props.openPlayer.profile.friendsList);
   const [inbox, setInbox] = useState(props.openPlayer?.inbox || []);
-  const getDBProfile = async () => {
-    await axios
-      .get(`${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/` + props.openPlayer?.userName)
-      .then(res => {
-        props.updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
-        setAboutMe(res.data.aboutMe);
-        setFriendsList(res.data.friendsList);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
+  useEffect(() => {
+    const getDBProfile = async () => {
+      await axios
+        .get(`${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/` + props.openPlayer?.userName)
+        .then(res => {
+          props.updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
+          setAboutMe(res.data.aboutMe);
+          setFriendsList(res.data.friendsList);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    };
+
+    getDBProfile();
+  }, [props]);
   const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
     // data for submit
     console.log(imageList, addUpdateIndex);
@@ -70,8 +74,6 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
 
   const toast = useToast();
   const coveyTownController = useTownController();
-
-  getDBProfile();
 
   useEffect(() => {
     if (props.open) {
@@ -103,14 +105,19 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
             onChange={onChange}
             dataURLKey='data_url'
             maxFileSize={MAX_IMAGE_SIZE}
-            onError={error => {
-              console.log('Error: ', error);
+            onError={errors => {
+              console.log('Error: ', errors);
               toast({
                 title: 'Error uploading image',
-                description: error && (
+                description: errors && (
                   <div>
-                    {error && (
+                    {errors.maxNumber && <span>Number of selected images exceed maxNumber</span>}
+                    {errors.acceptType && <span>Your selected file type is not allow</span>}
+                    {errors.maxFileSize && (
                       <span>Selected file size exceed maxFileSize: {MAX_IMAGE_SIZE} bytes</span>
+                    )}
+                    {errors.resolution && (
+                      <span>Selected file is not match your desired resolution</span>
                     )}
                   </div>
                 ),
@@ -246,6 +253,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                         .post(`${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/update`, profile)
                         .then(res => {
                           console.log(res.data);
+                          console.log(aboutMe);
                         })
                         .catch(error => {
                           console.log(error);
