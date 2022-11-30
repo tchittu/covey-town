@@ -1,4 +1,4 @@
-import { Avatar, Button, ButtonGroup, Heading, HStack, IconButton } from '@chakra-ui/react';
+import { Avatar, Button, ButtonGroup, Heading, HStack } from '@chakra-ui/react';
 import React from 'react';
 
 export function SelfFriendItem(props: { userName: string; onRemove: () => void }) {

@@ -14,7 +14,6 @@ import {
   FormLabel,
   Heading,
   HStack,
-  IconButton,
   Modal,
   ModalCloseButton,
   ModalContent,
