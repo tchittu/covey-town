@@ -32,6 +32,12 @@ To create an account and configure your local environment:
 | `TWILIO_API_KEY_SECRET` | The secret for the API key you created.   |
 | `TWILIO_API_AUTH_TOKEN` | Visible on your twilio account dashboard. |
 
+### Setting up the database
+
+Add the following lines to the same `.env` file as above:
+`ATLAS_URI=mongodb+srv://covey_town_user:cs4530@cluster0.bpcqjvf.mongodb.net/?retryWrites=true&w=majority`
+`PORT=8081`
+
 ### Starting the backend
 
 Once your backend is configured, you can start it by running `npm start` in the `townService` directory (the first time you run it, you will also need to run `npm install`).
