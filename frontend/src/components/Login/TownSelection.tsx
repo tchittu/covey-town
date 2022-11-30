@@ -87,7 +87,10 @@ export default function TownSelection(): JSX.Element {
           aboutMe: '',
           friendsList: [],
         };
-        await axios.post('http://localhost:8081/profiles/retrieveOrAdd', profile);
+        await axios.post(
+          `${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/retrieveOrAdd`,
+          profile,
+        );
 
         const playerProfile: PlayerProfile = {
           avatar: '',
@@ -163,7 +166,10 @@ export default function TownSelection(): JSX.Element {
         aboutMe: '',
         friendsList: [],
       };
-      await axios.post('http://localhost:8081/profiles/retrieveOrAdd', profile);
+      await axios.post(
+        `${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/retrieveOrAdd`,
+        profile,
+      );
       const newTownInfo = await townsService.createTown({
         friendlyName: newTownName,
         isPubliclyListed: newTownIsPublic,

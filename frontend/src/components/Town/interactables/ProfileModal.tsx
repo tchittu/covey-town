@@ -164,7 +164,10 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                                     friendsList: coveyTownController.ourPlayer.profile.friendsList,
                                   };
                                   await axios
-                                    .post('http://localhost:8081/profiles/update', profile)
+                                    .post(
+                                      `${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/update`,
+                                      profile,
+                                    )
                                     .then(res => {
                                       console.log(profile);
                                       console.log(res.data);
@@ -252,7 +255,10 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                         friendsList: props.self.profile.friendsList.filter(x => x !== tempUserName),
                       };
                       await axios
-                        .post('http://localhost:8081/profiles/addFriend', profile)
+                        .post(
+                          `${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/addFriend`,
+                          profile,
+                        )
                         .then(res => {
                           console.log(res.data);
                         })
@@ -276,7 +282,10 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                         friendsList: newFriendsList,
                       };
                       await axios
-                        .post('http://localhost:8081/profiles/addFriend', profile)
+                        .post(
+                          `${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/addFriend`,
+                          profile,
+                        )
                         .then(res => {
                           console.log(res.data);
                         })

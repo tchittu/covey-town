@@ -29,7 +29,10 @@ export default function TownMap(): JSX.Element {
 
   const getDBProfile = async () => {
     await axios
-      .get('http://localhost:8081/profiles/' + coveyTownController.ourPlayer.userName)
+      .get(
+        `${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/` +
+          coveyTownController.ourPlayer.userName,
+      )
       .then(res => {
         updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
       })

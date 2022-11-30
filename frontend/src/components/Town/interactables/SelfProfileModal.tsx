@@ -58,7 +58,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
   const [inbox, setInbox] = useState(props.openPlayer?.inbox || [])
   const getDBProfile = async () => {
     await axios
-    .get('http://localhost:8081/profiles/' + props.openPlayer?.userName)
+    .get(`${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/` + props.openPlayer?.userName)
     .then(res => {
       props.updateData(
         res.data.avatar,
@@ -215,7 +215,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                                     friendsList: newFriendsList,
                                   };
                                   await axios
-                                    .post('http://localhost:8081/profiles/update', profile)
+                                    .post(`${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/update`, profile)
                                     .then(res => {
                                       console.log(res.data);
                                     })
@@ -254,7 +254,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                         friendsList: friendsList,
                       };
                       await axios
-                        .post('http://localhost:8081/profiles/update', profile)
+                        .post(`${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/update`, profile)
                         .then(res => {
                           console.log(res.data);
                         })
