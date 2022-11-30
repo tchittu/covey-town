@@ -168,12 +168,20 @@ export default class Town {
       }
     });
 
+    // Listens for a playerUpdate from a client and then updates the profile
     socket.on('playerUpdate', (newPlayerProfile: PlayerProfile) => {
       this._updatePlayer(newPlayer, newPlayerProfile);
     });
     return newPlayer;
   }
 
+  /**
+   * Updates the given player's profile in the backend and tells the clients that
+   * the player's profile is updated
+   *
+   * @param player
+   * @param playerProfile
+   */
   private _updatePlayer(player: Player, playerProfile: PlayerProfile): void {
     player.updateProfile(playerProfile);
     this._broadcastEmitter.emit('playerUpdated', player.toPlayerModel());

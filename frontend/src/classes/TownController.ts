@@ -448,6 +448,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       }
     });
 
+    /**
+     * Listens for a playerUpdated event from the backend, if it hears one, then
+     * update the player's profile for this client
+     */
     this._socket.on('playerUpdated', updatedPlayer => {
       const playerToUpdate = this.players.find(eachPlayer => eachPlayer.id === updatedPlayer.id);
       if (playerToUpdate) {
@@ -456,6 +460,12 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
   }
 
+  /**
+   * Emit a playerUpdate event for the current player, updating our profile locally and
+   * also notifying the backend that our player's profile changed.
+   * 
+   * @param newPlayerProfile 
+   */
   public emitPlayerUpdate(newPlayerProfile: PlayerProfile) {
     this._socket.emit('playerUpdate', newPlayerProfile);
     const ourPlayer = this._ourPlayer;

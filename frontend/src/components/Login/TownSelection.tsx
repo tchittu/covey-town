@@ -250,7 +250,6 @@ export default function TownSelection(): JSX.Element {
             <FormControl>
               <FormLabel htmlFor='name'>Password</FormLabel>
               <Input
-                autoFocus
                 name='password'
                 placeholder='Your password'
                 value={password}
