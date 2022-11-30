@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   Avatar,
   Box,
@@ -8,14 +7,12 @@ import {
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   Flex,
   FormControl,
   FormLabel,
   Heading,
-  Input,
   Modal,
   ModalCloseButton,
   ModalContent,
@@ -35,7 +32,6 @@ import ImageUploading, { ImageListType, ImageType } from 'react-images-uploading
 import PlayerController from '../../../classes/PlayerController';
 import useTownController from '../../../hooks/useTownController';
 import { SelfFriendItem } from './SelfFriendItem';
-import { ExportInterface } from 'react-images-uploading/dist/typings';
 
 const MAX_IMAGE_SIZE = 209715;
 interface SelfProfileModalProps {
@@ -49,29 +45,22 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
   if (props.openPlayer == undefined) {
     throw new Error('Error in clicking logic!');
   }
-  useEffect(() => {
-    getDBProfile();
-  }, []);
   const [images, setImages] = useState([]);
   const [aboutMe, setAboutMe] = useState('');
   const [friendsList, setFriendsList] = useState(props.openPlayer.profile.friendsList);
-  const [inbox, setInbox] = useState(props.openPlayer?.inbox || [])
+  const [inbox, setInbox] = useState(props.openPlayer?.inbox || []);
   const getDBProfile = async () => {
     await axios
-    .get(`${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/` + props.openPlayer?.userName)
-    .then(res => {
-      props.updateData(
-        res.data.avatar,
-        res.data.aboutMe,
-        res.data.friendsList,
-      );
-      setAboutMe(res.data.aboutMe);
-      setFriendsList(res.data.friendsList);
-    })
-    .catch(error => {
-      console.log(error);
-    });
-  }
+      .get(`${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/` + props.openPlayer?.userName)
+      .then(res => {
+        props.updateData(res.data.avatar, res.data.aboutMe, res.data.friendsList);
+        setAboutMe(res.data.aboutMe);
+        setFriendsList(res.data.friendsList);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
   const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
     // data for submit
     console.log(imageList, addUpdateIndex);
@@ -82,6 +71,9 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
   const toast = useToast();
   const coveyTownController = useTownController();
 
+  useEffect(() => {
+    getDBProfile();
+  }, []);
   useEffect(() => {
     if (props.open) {
       coveyTownController.pause();
@@ -103,11 +95,11 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
         closeModal();
         coveyTownController.unPause();
       }}>
-      <ModalOverlay/>
+      <ModalOverlay />
       <ModalContent>
         <ModalCloseButton autoFocus={false} />
         <Flex align={'center'} justify={'center'} bg={useColorModeValue('gray.50', 'gray.800')}>
-        <ImageUploading 
+          <ImageUploading
             value={images}
             onChange={onChange}
             dataURLKey='data_url'
@@ -133,15 +125,8 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                 duration: 4000,
               });
             }}>
-        {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove }) => (
-          <Stack
-                spacing={4}
-                w={'full'}
-                maxW={'md'}
-                bg={useColorModeValue('white', 'gray.700')}
-                rounded={'xl'}
-                boxShadow={'lg'}
-                p={6}>
+            {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove }) => (
+              <Stack spacing={4} w={'full'} maxW={'md'} rounded={'xl'} boxShadow={'lg'} p={6}>
                 <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
                   User Profile Edit
                 </Heading>
@@ -155,14 +140,12 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                           src={
                             imageList.length === 0
                               ? props.openPlayer?.profile.avatar
-                              : imageList[0]['data_url']
+                              : imageList[0].data_url
                           }></Avatar>
                       </div>
                     </Center>
                     <Center w='full'>
-                      <Button w='full' 
-                      onClick={onImageUpload}
-                      >
+                      <Button w='full' onClick={onImageUpload}>
                         Change Avatar
                       </Button>
                     </Center>
@@ -191,31 +174,40 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                     <DrawerContent>
                       <DrawerCloseButton />
                       <DrawerHeader>{props.openPlayer?.userName + "'s Friends"}</DrawerHeader>
-                      
+
                       <DrawerBody>
                         <VStack w={400} spacing={4} align='start'>
                           {friendsList.map(friend => {
                             return (
                               <SelfFriendItem
+                                key={friend}
                                 userName={friend}
                                 onRemove={async () => {
-                                  const newFriendsList = friendsList.filter(filteredName => filteredName !== friend);
+                                  const newFriendsList = friendsList.filter(
+                                    filteredName => filteredName !== friend,
+                                  );
                                   setFriendsList(newFriendsList);
                                   props.updateData(
                                     imageList.length === 0
                                       ? props.openPlayer?.profile.avatar
-                                      : imageList[0]['data_url'],
+                                      : imageList[0].data_url,
                                     aboutMe,
                                     newFriendsList,
                                   );
                                   const profile = {
                                     username: props.openPlayer?.userName,
-                                    avatar: imageList.length === 0 ? props.openPlayer?.profile.avatar : imageList[0]['data_url'],
+                                    avatar:
+                                      imageList.length === 0
+                                        ? props.openPlayer?.profile.avatar
+                                        : imageList[0].data_url,
                                     aboutMe: aboutMe,
                                     friendsList: newFriendsList,
                                   };
                                   await axios
-                                    .post(`${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/update`, profile)
+                                    .post(
+                                      `${process.env.REACT_APP_TOWNS_SERVICE_URL}/profiles/update`,
+                                      profile,
+                                    )
                                     .then(res => {
                                       console.log(res.data);
                                     })
@@ -243,13 +235,16 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                       props.updateData(
                         imageList.length === 0
                           ? props.openPlayer?.profile.avatar
-                          : imageList[0]['data_url'],
+                          : imageList[0].data_url,
                         aboutMe,
                         friendsList,
                       );
                       const profile = {
                         username: props.openPlayer?.userName,
-                        avatar: imageList.length === 0 ? props.openPlayer?.profile.avatar : imageList[0]['data_url'],
+                        avatar:
+                          imageList.length === 0
+                            ? props.openPlayer?.profile.avatar
+                            : imageList[0].data_url,
                         aboutMe: aboutMe,
                         friendsList: friendsList,
                       };
@@ -266,24 +261,24 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                     Submit
                   </Button>
                 </Stack>
-            <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
-              Inbox
-            </Heading>
-              <div style={{ whiteSpace: 'pre-wrap' }}>
-                {inboxToText(props.openPlayer?.inbox || [])}
-              </div>
-              <Button
-              onClick={() => {
-                if (props.openPlayer) {
-                  setInbox([]);
-                  props.openPlayer?.clearInbox();
-                }
-              }}>
-                Clear Inbox
-              </Button>
-            </Stack>
-           )}
-            </ImageUploading> 
+                <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
+                  Inbox
+                </Heading>
+                <div style={{ whiteSpace: 'pre-wrap' }}>
+                  {inboxToText(props.openPlayer?.inbox || [])}
+                </div>
+                <Button
+                  onClick={() => {
+                    if (props.openPlayer) {
+                      setInbox([]);
+                      props.openPlayer?.clearInbox();
+                    }
+                  }}>
+                  Clear Inbox
+                </Button>
+              </Stack>
+            )}
+          </ImageUploading>
         </Flex>
       </ModalContent>
     </Modal>
