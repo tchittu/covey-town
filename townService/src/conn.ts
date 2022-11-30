@@ -6,7 +6,9 @@ const client = new MongoClient(DB);
 
 let db: any;
 
-const connectToServer = async function (_callback: any) {
+// Here we have an unused variable _callback, which causes a no-unused-vars warning.
+// This is necessary because this is required for the connectToServer function.
+const connectToServer = async (_callback: any) => {
   try {
     await client.connect();
     console.log('Connected correctly to server');
@@ -17,8 +19,6 @@ const connectToServer = async function (_callback: any) {
   }
 };
 
-const getDb = function () {
-  return db;
-};
+const getDb = () => db;
 
 export { connectToServer, getDb };
