@@ -146,7 +146,7 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                               {friend}
                             </Heading>
                             <ButtonGroup>
-                              <IconButton
+                              <Button
                                 hidden={isHidden}
                                 aria-label='Add to friends'
                                 size='xs'
@@ -176,8 +176,9 @@ export default function ProfileModal(props: ProfileModalProps): JSX.Element {
                                       console.log(error);
                                     });
                                   props.handleClick();
-                                }}
-                              />
+                                }}>
+                                Add
+                              </Button>
                             </ButtonGroup>
                           </HStack>
                         );

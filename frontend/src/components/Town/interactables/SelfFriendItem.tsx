@@ -1,4 +1,4 @@
-import { Avatar, ButtonGroup, Heading, HStack, IconButton } from '@chakra-ui/react';
+import { Avatar, Button, ButtonGroup, Heading, HStack, IconButton } from '@chakra-ui/react';
 import React from 'react';
 
 export function SelfFriendItem(props: { userName: string; onRemove: () => void }) {
@@ -9,7 +9,9 @@ export function SelfFriendItem(props: { userName: string; onRemove: () => void }
         {props.userName}
       </Heading>
       <ButtonGroup>
-        <IconButton aria-label='Remove from friends' size='xs' onClick={props.onRemove} />
+        <Button aria-label='Remove from friends' size='xs' onClick={props.onRemove}>
+          Remove
+        </Button>
       </ButtonGroup>
     </HStack>
   );

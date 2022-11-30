@@ -50,7 +50,6 @@ profileRoutes.route('/profiles/add').post((req: Request, response: Response) => 
 profileRoutes.route('/profiles/retrieveOrAdd').post(async (req: Request, response: Response) => {
   const dbConnect = dbo.getDb();
 
-  console.log(req.body);
   const result = await dbConnect.collection('profiles').findOne({ username: req.body.username });
 
   if (result) {
