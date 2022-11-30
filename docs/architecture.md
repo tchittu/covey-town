@@ -94,14 +94,24 @@ export interface ServerToClientEvents {
   initialize: (initialData: TownJoinResponse) => void;
   townSettingsUpdated: (update: TownSettingsUpdate) => void;
   townClosing: () => void;
-  conversationAreaUpdated: (conversationArea: ConversationArea) => void;
-  conversationAreaDestroyed: (conversationArea: ConversationArea) => void;
   chatMessage: (message: ChatMessage) => void;
+  interactableUpdate: (interactable: Interactable) => void;
+  playerUpdated: (updatedPlayer: Player) => void;
+  directMessage: ({
+    message: ChatMessage,
+    toPlayer: string,
+  }: DirectMessage) => void;
 }
 
 export interface ClientToServerEvents {
   chatMessage: (message: ChatMessage) => void;
   playerMovement: (movementData: PlayerLocation) => void;
+  interactableUpdate: (update: Interactable) => void;
+  playerUpdate: (newPlayerProfile: PlayerProfile) => void;
+  directMessage: ({
+    message: ChatMessage,
+    toPlayer: string,
+  }: DirectMessage) => void;
 }
 ```
 
