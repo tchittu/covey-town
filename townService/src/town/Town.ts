@@ -9,7 +9,6 @@ import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
   CoveyTownSocket,
-  DirectMessage,
   Interactable,
   PlayerLocation,
   PlayerProfile,

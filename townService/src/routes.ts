@@ -1,3 +1,10 @@
+// Explanation of lint warnings:
+// We have no-explicit-any warnings in these database files because some of the functions used
+// by axios and the router can accept parameters of any type, so we were unable to specify the
+// type as something other than any.
+// We also have no-console warnings because we are using console.log to notify us that we
+// are connected to the server correctly.
+
 import express, { Request, Response, Router } from 'express';
 
 // This will help us connect to the database
@@ -14,7 +21,7 @@ profileRoutes.route('/profiles').get((_req: Request, res: Response) => {
   dbConnect
     .collection('profiles')
     .find({})
-    .toArray((err: any, result: any) => {
+    .toArray((err: Error, result: any) => {
       if (err) throw err;
       res.json(result);
     });
@@ -24,7 +31,7 @@ profileRoutes.route('/profiles').get((_req: Request, res: Response) => {
 profileRoutes.route('/profiles/:username').get((req: Request, res: Response) => {
   const dbConnect = dbo.getDb();
   const myquery = { username: req.params.username };
-  dbConnect.collection('profiles').findOne(myquery, (err: any, result: any) => {
+  dbConnect.collection('profiles').findOne(myquery, (err: Error, result: any) => {
     if (err) throw err;
     res.json(result);
   });
@@ -40,7 +47,7 @@ profileRoutes.route('/profiles/add').post((req: Request, response: Response) => 
     aboutMe: req.body.aboutMe,
     friendsList: req.body.friendsList,
   };
-  dbConnect.collection('profiles').insertOne(myobj, (err: any, res: any) => {
+  dbConnect.collection('profiles').insertOne(myobj, (err: Error, res: any) => {
     if (err) throw err;
     response.json(res);
   });
@@ -68,7 +75,7 @@ profileRoutes.route('/profiles/retrieveOrAdd').post(async (req: Request, respons
       aboutMe: req.body.aboutMe,
       friendsList: req.body.friendsList,
     };
-    dbConnect.collection('profiles').insertOne(myobj, (err: any, res: any) => {
+    dbConnect.collection('profiles').insertOne(myobj, (err: Error, res: any) => {
       if (err) throw err;
       response.json(res);
     });
@@ -86,7 +93,7 @@ profileRoutes.route('/profiles/update').post(async (req: Request, response: Resp
       friendsList: req.body.friendsList,
     },
   };
-  dbConnect.collection('profiles').updateOne(myquery, newvalues, (err: any, res: any) => {
+  dbConnect.collection('profiles').updateOne(myquery, newvalues, (err: Error, res: any) => {
     if (err) throw err;
     console.log(`${res.matchedCount} document(s) matched the query criteria.`);
     console.log(`${res.modifiedCount} document(s) was/were updated.`);
@@ -103,7 +110,7 @@ profileRoutes.route('/profiles/addFriend').post(async (req: Request, response: R
       friendsList: req.body.friendsList,
     },
   };
-  dbConnect.collection('profiles').updateOne(myquery, newvalues, (err: any, res: any) => {
+  dbConnect.collection('profiles').updateOne(myquery, newvalues, (err: Error, res: any) => {
     if (err) throw err;
     console.log(`${res.matchedCount} document(s) matched the query criteria.`);
     console.log(`${res.modifiedCount} document(s) was/were updated.`);
@@ -115,7 +122,7 @@ profileRoutes.route('/profiles/addFriend').post(async (req: Request, response: R
 profileRoutes.route('/:username').delete((req: Request, response: Response) => {
   const dbConnect = dbo.getDb();
   const myquery = { _username: req.params.username };
-  dbConnect.collection('profiles').deleteOne(myquery, (err: any, obj: any) => {
+  dbConnect.collection('profiles').deleteOne(myquery, (err: Error, obj: any) => {
     if (err) throw err;
     console.log('1 document deleted');
     response.json(obj);
