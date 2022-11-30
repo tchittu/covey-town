@@ -28,7 +28,7 @@ import {
 import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import { inboxToText } from './Inbox';
-import ImageUploading, { ImageListType, ImageType } from 'react-images-uploading';
+import ImageUploading, { ImageListType } from 'react-images-uploading';
 import PlayerController from '../../../classes/PlayerController';
 import useTownController from '../../../hooks/useTownController';
 import { SelfFriendItem } from './SelfFriendItem';
@@ -71,9 +71,8 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
   const toast = useToast();
   const coveyTownController = useTownController();
 
-  useEffect(() => {
-    getDBProfile();
-  }, []);
+  getDBProfile();
+
   useEffect(() => {
     if (props.open) {
       coveyTownController.pause();
@@ -85,7 +84,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
   const closeModal = useCallback(() => {
     coveyTownController.unPause();
     props.handleClick();
-  }, [coveyTownController, props.handleClick]);
+  }, [coveyTownController, props]);
 
   return (
     <Modal
@@ -104,19 +103,14 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
             onChange={onChange}
             dataURLKey='data_url'
             maxFileSize={MAX_IMAGE_SIZE}
-            onError={(errors: any, files: any) => {
-              console.log('Error: ', errors);
+            onError={error => {
+              console.log('Error: ', error);
               toast({
                 title: 'Error uploading image',
-                description: errors && (
+                description: error && (
                   <div>
-                    {errors.maxNumber && <span>Number of selected images exceed maxNumber</span>}
-                    {errors.acceptType && <span>Your selected file type is not allow</span>}
-                    {errors.maxFileSize && (
+                    {error && (
                       <span>Selected file size exceed maxFileSize: {MAX_IMAGE_SIZE} bytes</span>
-                    )}
-                    {errors.resolution && (
-                      <span>Selected file is not match your desired resolution</span>
                     )}
                   </div>
                 ),
@@ -125,7 +119,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                 duration: 4000,
               });
             }}>
-            {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove }) => (
+            {({ imageList, onImageUpload }) => (
               <Stack spacing={4} w={'full'} maxW={'md'} rounded={'xl'} boxShadow={'lg'} p={6}>
                 <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
                   User Profile Edit
@@ -271,6 +265,7 @@ export default function SelfProfileModal(props: SelfProfileModalProps): JSX.Elem
                   onClick={() => {
                     if (props.openPlayer) {
                       setInbox([]);
+                      console.log(inbox);
                       props.openPlayer?.clearInbox();
                     }
                   }}>
