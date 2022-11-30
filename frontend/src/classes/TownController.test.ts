@@ -189,16 +189,16 @@ describe('TownController', () => {
       expect(mockSocket.emit).toBeCalledWith('chatMessage', testMessage);
     });
     it('Emits locally written direct messages to the socket, and dispatches no other events', () => {
-      const testMessage: ChatMessage = {
+      const message: ChatMessage = {
         author: nanoid(),
         body: nanoid(),
         dateCreated: new Date(),
         sid: nanoid(),
       };
       const toPlayer = 'player1';
-      testController.emitDirectMessage({ message: testMessage, toPlayer });
+      testController.emitDirectMessage({ message, toPlayer });
 
-      expect(mockSocket.emit).toBeCalledWith('directMessage', { testMessage, toPlayer });
+      expect(mockSocket.emit).toBeCalledWith('directMessage', { message, toPlayer });
     });
     it('Emits conversationAreasChanged when a conversation area is created', () => {
       const newConvArea = townJoinResponse.interactables.find(
